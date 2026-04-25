@@ -75,7 +75,7 @@ WSGI_APPLICATION = 'masroofy.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR / 'database' / 'masroofy.db',
     }
 }
 
