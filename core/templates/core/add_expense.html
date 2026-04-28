@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Masroofy - Add Expense</title>
+  
+  <link rel="stylesheet" href="CSS/reset.css">
+  <link rel="stylesheet" href="CSS/variables.css">
+  <link rel="stylesheet" href="CSS/layout.css">
+  <link rel="stylesheet" href="CSS/components.css">
+  <link rel="stylesheet" href="CSS/pages.css">
+  <link rel="stylesheet" href="CSS/main.css">
+  
+  <style>
+    .form-container {
+      background: var(--color-surface);
+      padding: var(--space-8);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .form-group {
+      margin-bottom: var(--space-5);
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: var(--space-2);
+      font-weight: var(--weight-medium);
+      color: var(--color-text);
+    }
+    .form-control {
+      width: 100%;
+      padding: var(--space-3);
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: var(--text-base);
+      background: var(--color-off-white);
+      transition: border-color var(--duration-fast);
+      color: var(--color-text);
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      background: var(--color-surface);
+    }
+    .form-control.error {
+      border-color: var(--color-danger);
+    }
+    .btn-primary {
+      width: 100%;
+      padding: var(--space-4);
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: var(--text-lg);
+      font-weight: var(--weight-bold);
+      cursor: pointer;
+      margin-top: var(--space-4);
+      transition: background var(--duration-fast), transform var(--duration-fast);
+      box-shadow: var(--shadow-coral);
+    }
+    .btn-primary:hover {
+      background: var(--color-primary-hover);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <!-- Global Navbar -->
+  <nav style="position: absolute; top: 0; left: 0; width: 100%; height: 64px; padding: 0 var(--space-8); display: flex; justify-content: space-between; align-items: center; background: var(--color-surface); backdrop-filter: blur(8px); border-bottom: 1px solid var(--color-border); z-index: 1000;">
+    <div style="font-family: var(--font-display); font-size: var(--text-xl); font-weight: var(--weight-bold); color: var(--color-text);">💸 Masroofy</div>
+    <div style="display: flex; gap: var(--space-4); align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+      <a href="dashboard.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Dashboard</a>
+      <a href="add_expense.html" style="color: var(--color-primary); text-decoration: none; font-weight: var(--weight-bold); font-size: var(--text-sm);">Add Expense</a>
+      <a href="history.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">History</a>
+      <a href="reports.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Reports</a>
+      <a href="settings.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Settings</a>
+      <div style="width: 1px; height: 16px; background: var(--color-border); margin: 0 var(--space-2);"></div>
+      <a href="#" id="navLogout" style="color: var(--color-danger); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Logout</a>
+    </div>
+  </nav>
+
+  <div class="app-container" style="padding-top: 64px; height: calc(100vh - 64px);">
+    <aside id="appSidebar" class="sidebar"></aside>
+
+    <main class="main-content">
+      <header id="appTopbar" class="topbar"></header>
+
+      <div class="page-content">
+        <div class="form-container">
+          <form id="expenseForm">
+            <div class="form-group">
+              <label for="amount">Amount ($)</label>
+              <input type="number" step="0.01" id="amount" name="amount" class="form-control" placeholder="0.00" required>
+            </div>
+
+            <div class="form-group">
+              <label for="type">Type</label>
+              <select id="type" name="type" class="form-control">
+                <option value="expense">💸 Expense</option>
+                <option value="income">💰 Income</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="category">Category</label>
+              <select id="category" name="category" class="form-control" required style="font-size: var(--text-lg); padding: var(--space-3);">
+                <option value="food">🍔 Food</option>
+                <option value="transport">🚌 Transport</option>
+                <option value="shopping">🛍️ Shopping</option>
+                <option value="entertainment">🍿 Entertainment</option>
+                <option value="bills">💡 Bills</option>
+                <option value="other">✨ Other</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="date">Date</label>
+              <input type="date" id="date" name="date" class="form-control" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="note">Note (Optional)</label>
+              <input type="text" id="note" name="note" class="form-control" placeholder="e.g. Lunch with friends">
+            </div>
+            
+            <button type="submit" class="btn-primary">Add Transaction 💸</button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { AppContainer } from './JS/core.js';
+    import { SidebarComponent, TopbarComponent, ToastManager, FormValidator } from './JS/ui.js';
+    import './JS/services.js';
+    
+    AppContainer.get('authService').requireAuth();
+    
+    new SidebarComponent('#appSidebar', AppContainer.get('authService'), 'add_expense').mount();
+    new TopbarComponent('#appTopbar', { title: 'Add Expense', subtitle: 'Track where your money goes' }).mount();
+
+    // Logout
+    document.getElementById('navLogout').addEventListener('click', (e) => {
+      e.preventDefault();
+      AppContainer.get('authService').logout();
+    });
+    
+    // Set today's date as default
+    document.getElementById('date').valueAsDate = new Date();
+
+    // Form submission
+    const form = document.getElementById('expenseForm');
+    const toast = AppContainer.has('toast') ? AppContainer.get('toast') : new ToastManager();
+    
+    const schema = {
+      amount: [
+        { rule: 'required', message: 'Amount is required' },
+        { rule: 'numeric', message: 'Must be a valid number' },
+        { rule: 'min', value: 0.01, message: 'Amount must be greater than 0' }
+      ],
+      date: [
+        { rule: 'required', message: 'Date is required' }
+      ]
+    };
+    
+    const validator = new FormValidator(schema);
+    validator.bindLive(form);
+    
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const values = Object.fromEntries(formData.entries());
+      
+      const { valid, errors } = validator.validate(values);
+      if (valid) {
+        try {
+          AppContainer.get('expenseService').add({
+            amount: Number(values.amount),
+            category: values.category,
+            date: values.date,
+            note: values.note || '',
+            description: values.note || values.category, // required field mapped from note
+            type: values.type || 'expense'
+          });
+          const label = values.type === 'income' ? 'income' : 'expense';
+          toast.success(`Successfully added $${Number(values.amount).toFixed(2)} ${label}!`, 'Transaction Added');
+          form.reset();
+          document.getElementById('date').valueAsDate = new Date();
+        } catch (err) {
+          toast.error(err.message || 'An error occurred', 'Failed to add');
+        }
+      } else {
+        validator.applyErrors(form, errors);
+      }
+    });
+  </script>
+</body>
+</html>
