@@ -24,6 +24,7 @@
     .filter-group {
       display: flex;
       gap: var(--space-2);
+      flex-wrap: wrap;
     }
     .filter-select, .search-input {
       padding: var(--space-2) var(--space-3);
@@ -37,7 +38,6 @@
       outline: none;
       border-color: var(--color-primary);
     }
-    
     .transaction-list {
       background: var(--color-surface);
       border-radius: var(--radius-xl);
@@ -52,52 +52,37 @@
       border-bottom: 1px solid var(--color-border);
       transition: background var(--duration-fast);
     }
-    .transaction-item:hover {
-      background: var(--color-surface-2);
-    }
-    .transaction-item:last-child {
-      border-bottom: none;
-    }
-    .tx-info {
-      display: flex;
-      align-items: center;
-      gap: var(--space-4);
-    }
+    .transaction-item:hover { background: var(--color-surface-2); }
+    .transaction-item:last-child { border-bottom: none; }
+    .tx-info { display: flex; align-items: center; gap: var(--space-4); }
     .tx-icon {
-      width: 48px;
-      height: 48px;
+      width: 48px; height: 48px;
       border-radius: var(--radius-md);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       font-size: var(--text-xl);
       background: var(--color-off-white);
     }
-    .tx-details h4 {
-      margin: 0;
-      color: var(--color-text);
-      font-weight: var(--weight-semibold);
+    .tx-details h4 { margin: 0; color: var(--color-text); font-weight: var(--weight-semibold); }
+    .tx-details p  { margin: 0; color: var(--color-text-muted); font-size: var(--text-sm); }
+    .tx-meta { text-align: right; }
+    .tx-amount { font-weight: var(--weight-bold); color: var(--color-danger); font-size: var(--text-lg); }
+    .tx-amount.income { color: var(--color-success); }
+    .tx-date { color: var(--color-text-faint); font-size: var(--text-xs); }
+    .delete-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--color-text-faint); font-size: var(--text-lg);
+      margin-left: var(--space-3); padding: var(--space-1);
+      border-radius: var(--radius-sm);
+      transition: color var(--duration-fast), background var(--duration-fast);
     }
-    .tx-details p {
-      margin: 0;
+    .delete-btn:hover { color: var(--color-danger); background: var(--color-danger-subtle); }
+    .results-count { font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-3); }
+    .empty-state {
+      padding: var(--space-10);
+      text-align: center;
       color: var(--color-text-muted);
-      font-size: var(--text-sm);
     }
-    .tx-meta {
-      text-align: right;
-    }
-    .tx-amount {
-      font-weight: var(--weight-bold);
-      color: var(--color-danger);
-      font-size: var(--text-lg);
-    }
-    .tx-amount.income {
-      color: var(--color-success);
-    }
-    .tx-date {
-      color: var(--color-text-faint);
-      font-size: var(--text-xs);
-    }
+    .empty-state a { color: var(--color-primary); font-weight: var(--weight-semibold); }
   </style>
 </head>
 <body>
@@ -107,11 +92,11 @@
     <div style="display: flex; gap: var(--space-4); align-items: center; flex-wrap: wrap; justify-content: flex-end;">
       <a href="dashboard.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Dashboard</a>
       <a href="add_expense.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Add Expense</a>
-      <a href="history.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">History</a>
+      <a href="history.html" style="color: var(--color-primary); text-decoration: none; font-weight: var(--weight-bold); font-size: var(--text-sm);">History</a>
       <a href="reports.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Reports</a>
       <a href="settings.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Settings</a>
       <div style="width: 1px; height: 16px; background: var(--color-border); margin: 0 var(--space-2);"></div>
-      <a href="login.html" style="color: var(--color-danger); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Logout</a>
+      <a href="#" id="navLogout" style="color: var(--color-danger); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Logout</a>
     </div>
   </nav>
 
@@ -124,25 +109,33 @@
       <div class="page-content">
         
         <div class="history-header">
-          <input type="text" class="search-input" placeholder="Search transactions...">
+          <input type="text" id="searchInput" class="search-input" placeholder="Search transactions..." style="min-width: 220px;">
           <div class="filter-group">
-            <select class="filter-select">
+            <select id="categoryFilter" class="filter-select">
               <option value="all">All Categories</option>
-              <option value="food">Food</option>
-              <option value="transport">Transport</option>
-              <option value="entertainment">Entertainment</option>
+              <option value="food">🍔 Food</option>
+              <option value="transport">🚌 Transport</option>
+              <option value="shopping">🛍️ Shopping</option>
+              <option value="entertainment">🍿 Entertainment</option>
+              <option value="bills">💡 Bills</option>
+              <option value="other">✨ Other</option>
             </select>
-            <select class="filter-select">
-              <option value="month">This Month</option>
+            <select id="typeFilter" class="filter-select">
+              <option value="all">All Types</option>
+              <option value="expense">💸 Expenses</option>
+              <option value="income">💰 Income</option>
+            </select>
+            <select id="periodFilter" class="filter-select">
+              <option value="all">All Time</option>
+              <option value="month" selected>This Month</option>
               <option value="week">This Week</option>
               <option value="year">This Year</option>
             </select>
           </div>
         </div>
 
-        <div class="transaction-list" id="transactionList">
-          <!-- Dynamic transactions will load here -->
-        </div>
+        <div id="resultsCount" class="results-count"></div>
+        <div class="transaction-list" id="transactionList"></div>
 
       </div>
     </main>
@@ -150,7 +143,7 @@
 
   <script type="module">
     import { AppContainer } from './JS/core.js';
-    import { SidebarComponent, TopbarComponent } from './JS/ui.js';
+    import { SidebarComponent, TopbarComponent, ToastManager } from './JS/ui.js';
     import './JS/services.js';
     
     AppContainer.get('authService').requireAuth();
@@ -158,50 +151,118 @@
     new SidebarComponent('#appSidebar', AppContainer.get('authService'), 'history').mount();
     new TopbarComponent('#appTopbar', { title: 'History', subtitle: 'All your past transactions' }).mount();
 
+    document.getElementById('navLogout').addEventListener('click', (e) => {
+      e.preventDefault();
+      AppContainer.get('authService').logout();
+    });
+
     const expenseService = AppContainer.get('expenseService');
-    const formatter = AppContainer.get('formatter');
-    const listEl = document.getElementById('transactionList');
+    const formatter      = AppContainer.get('formatter');
+    const toast          = AppContainer.has('toast') ? AppContainer.get('toast') : new ToastManager();
+    const listEl         = document.getElementById('transactionList');
+    const countEl        = document.getElementById('resultsCount');
     
     const icons = {
-      food: { icon: '🍔', bg: 'var(--color-coral-subtle)' },
-      transport: { icon: '🚌', bg: 'var(--color-blue-subtle)' },
+      food:          { icon: '🍔', bg: 'var(--color-coral-subtle)' },
+      transport:     { icon: '🚌', bg: 'var(--color-blue-subtle)' },
       entertainment: { icon: '🍿', bg: 'var(--color-yellow-subtle)' },
-      shopping: { icon: '🛍️', bg: 'var(--color-success-subtle)' },
-      bills: { icon: '💡', bg: 'var(--color-info-subtle)' },
-      other: { icon: '✨', bg: 'var(--color-surface-2)' },
+      shopping:      { icon: '🛍️', bg: 'var(--color-success-subtle)' },
+      bills:         { icon: '💡', bg: 'var(--color-info-subtle)' },
+      other:         { icon: '✨', bg: 'var(--color-surface-2)' },
     };
+
+    function getDateRange(period) {
+      const now   = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      if (period === 'week') {
+        const start = new Date(today);
+        start.setDate(today.getDate() - today.getDay());
+        return { from: start.toISOString().split('T')[0], to: now.toISOString().split('T')[0] };
+      }
+      if (period === 'month') {
+        return {
+          from: `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`,
+          to:   now.toISOString().split('T')[0]
+        };
+      }
+      if (period === 'year') {
+        return { from: `${now.getFullYear()}-01-01`, to: now.toISOString().split('T')[0] };
+      }
+      return null;
+    }
     
     function renderTransactions() {
-      const expenses = expenseService.getAll();
+      const search   = document.getElementById('searchInput').value.trim();
+      const category = document.getElementById('categoryFilter').value;
+      const type     = document.getElementById('typeFilter').value;
+      const period   = document.getElementById('periodFilter').value;
+      const range    = getDateRange(period);
+
+      const query = {};
+      if (search)          query.search   = search;
+      if (category !== 'all') query.category = category;
+      if (type     !== 'all') query.type     = type;
+      if (range)           { query.from = range.from; query.to = range.to; }
+
+      const expenses = expenseService.query(query);
       
+      countEl.textContent = `${expenses.length} transaction${expenses.length !== 1 ? 's' : ''} found`;
+
       if (expenses.length === 0) {
-        listEl.innerHTML = '<div style="padding: var(--space-6); text-align: center; color: var(--color-text-muted);">No transactions yet. Add some from the Dashboard!</div>';
+        listEl.innerHTML = `<div class="empty-state">No transactions match your filters.<br><a href="add_expense.html">Add a transaction →</a></div>`;
         return;
       }
       
       listEl.innerHTML = expenses.map(tx => {
-        const style = icons[tx.category] || icons.other;
+        const style      = icons[tx.category] || icons.other;
         const amountClass = tx.type === 'income' ? 'income' : '';
-        const sign = tx.type === 'income' ? '+' : '-';
+        const sign       = tx.type === 'income' ? '+' : '-';
+        const label      = tx.note || tx.description || tx.category;
         
         return `
-          <div class="transaction-item">
+          <div class="transaction-item" data-id="${tx.id}">
             <div class="tx-info">
               <div class="tx-icon" style="background: ${style.bg};">${style.icon}</div>
               <div class="tx-details">
                 <h4>${tx.category.charAt(0).toUpperCase() + tx.category.slice(1)}</h4>
-                <p>${tx.note || 'No note'}</p>
+                <p>${label}</p>
               </div>
             </div>
-            <div class="tx-meta">
-              <div class="tx-amount ${amountClass}">${sign}${formatter.money(tx.amount)}</div>
-              <div class="tx-date">${formatter.relativeDate(tx.date)}</div>
+            <div style="display:flex;align-items:center;">
+              <div class="tx-meta">
+                <div class="tx-amount ${amountClass}">${sign}${formatter.money(tx.amount)}</div>
+                <div class="tx-date">${formatter.relativeDate(tx.date)}</div>
+              </div>
+              <button class="delete-btn" data-id="${tx.id}" title="Delete transaction">🗑️</button>
             </div>
           </div>
         `;
       }).join('');
+
+      // Delete buttons
+      listEl.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = btn.dataset.id;
+          if (confirm('Delete this transaction?')) {
+            try {
+              expenseService.delete(id);
+              toast.success('Transaction deleted', 'Deleted');
+              renderTransactions();
+            } catch (err) {
+              toast.error(err.message, 'Error');
+            }
+          }
+        });
+      });
     }
     
+    // Bind filter controls
+    ['searchInput', 'categoryFilter', 'typeFilter', 'periodFilter'].forEach(id => {
+      document.getElementById(id).addEventListener('input', renderTransactions);
+      document.getElementById(id).addEventListener('change', renderTransactions);
+    });
+
     renderTransactions();
   </script>
 </body>

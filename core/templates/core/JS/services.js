@@ -589,8 +589,6 @@ class ReportService extends BaseService {
    EXPORT & WIRE UP — Register services in container
    ============================================================ */
 
-import { AppContainer, BaseRepository, LocalStorageAdapter } from './core.js';
-
 AppContainer.register('expenseRepo', (c) =>
   new BaseRepository(c.get('storage'), 'expenses')
 );

@@ -499,3 +499,10 @@
   .topbar { padding: 0 var(--space-5); }
   .page-content { padding: var(--space-6) var(--space-5); }
 }
+
+/* ── App Container alias (used in HTML pages) ── */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+  background: var(--color-surface);
+}

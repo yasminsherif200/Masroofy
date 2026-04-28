@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,11 +13,7 @@
   <link rel="stylesheet" href="CSS/main.css">
 
   <style>
-    .settings-container {
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
+    .settings-container { max-width: 800px; margin: 0 auto; }
     .settings-section {
       background: var(--color-surface);
       padding: var(--space-6);
@@ -26,7 +21,6 @@
       box-shadow: var(--shadow-sm);
       margin-bottom: var(--space-6);
     }
-
     .settings-section h3 {
       font-family: var(--font-display);
       font-size: var(--text-xl);
@@ -35,18 +29,13 @@
       padding-bottom: var(--space-2);
       border-bottom: 1px solid var(--color-border);
     }
-
-    .form-group {
-      margin-bottom: var(--space-4);
-    }
-
+    .form-group { margin-bottom: var(--space-4); }
     .form-group label {
       display: block;
       margin-bottom: var(--space-2);
       font-weight: var(--weight-medium);
       color: var(--color-text);
     }
-
     .form-control {
       width: 100%;
       padding: var(--space-3);
@@ -55,104 +44,67 @@
       background: var(--color-off-white);
       color: var(--color-text);
     }
-
-    .form-control:focus {
-      outline: none;
-      border-color: var(--color-primary);
-    }
-
+    .form-control:focus { outline: none; border-color: var(--color-primary); }
     .btn-primary {
       padding: var(--space-3) var(--space-6);
       background: var(--color-primary);
-      color: white;
-      border: none;
+      color: white; border: none;
       border-radius: var(--radius-md);
       font-weight: var(--weight-bold);
       cursor: pointer;
       transition: background var(--duration-fast);
     }
-
-    .btn-primary:hover {
-      background: var(--color-primary-hover);
-    }
-
+    .btn-primary:hover { background: var(--color-primary-hover); }
     .theme-toggle-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: var(--space-4) 0;
+      border-bottom: 1px solid var(--color-border);
     }
-
-    /* Toggle switch CSS */
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 50px;
-      height: 28px;
-    }
-
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
+    .theme-toggle-row:last-child { border-bottom: none; }
+    .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
     .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      position: absolute; cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
       background-color: var(--color-border-strong);
-      transition: .4s;
-      border-radius: 34px;
+      transition: .4s; border-radius: 34px;
     }
-
     .slider:before {
-      position: absolute;
-      content: "";
-      height: 20px;
-      width: 20px;
-      left: 4px;
-      bottom: 4px;
+      position: absolute; content: "";
+      height: 20px; width: 20px;
+      left: 4px; bottom: 4px;
       background-color: white;
-      transition: .4s;
-      border-radius: 50%;
+      transition: .4s; border-radius: 50%;
     }
-
-    input:checked+.slider {
-      background-color: var(--color-accent);
+    input:checked + .slider { background-color: var(--color-accent); }
+    input:checked + .slider:before { transform: translateX(22px); }
+    .toast-msg {
+      position: fixed; bottom: var(--space-6); right: var(--space-6);
+      background: var(--color-success); color: white;
+      padding: var(--space-3) var(--space-5);
+      border-radius: var(--radius-lg); box-shadow: var(--shadow-md);
+      font-weight: var(--weight-medium);
+      transform: translateY(100px); opacity: 0;
+      transition: all 0.3s ease; z-index: 999;
     }
-
-    input:checked+.slider:before {
-      transform: translateX(22px);
-    }
+    .toast-msg.show { transform: translateY(0); opacity: 1; }
   </style>
 </head>
 
 <body>
   <!-- Global Navbar -->
-  <nav
-    style="position: absolute; top: 0; left: 0; width: 100%; height: 64px; padding: 0 var(--space-8); display: flex; justify-content: space-between; align-items: center; background: var(--color-surface); backdrop-filter: blur(8px); border-bottom: 1px solid var(--color-border); z-index: 1000;">
-    <div
-      style="font-family: var(--font-display); font-size: var(--text-xl); font-weight: var(--weight-bold); color: var(--color-text);">
-      💸 Masroofy</div>
+  <nav style="position: absolute; top: 0; left: 0; width: 100%; height: 64px; padding: 0 var(--space-8); display: flex; justify-content: space-between; align-items: center; background: var(--color-surface); backdrop-filter: blur(8px); border-bottom: 1px solid var(--color-border); z-index: 1000;">
+    <div style="font-family: var(--font-display); font-size: var(--text-xl); font-weight: var(--weight-bold); color: var(--color-text);">💸 Masroofy</div>
     <div style="display: flex; gap: var(--space-4); align-items: center; flex-wrap: wrap; justify-content: flex-end;">
-      <a href="dashboard.html"
-        style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Dashboard</a>
-      <a href="add_expense.html"
-        style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Add
-        Expense</a>
-      <a href="history.html"
-        style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">History</a>
-      <a href="reports.html"
-        style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Reports</a>
-      <a href="settings.html"
-        style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Settings</a>
+      <a href="dashboard.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Dashboard</a>
+      <a href="add_expense.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Add Expense</a>
+      <a href="history.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">History</a>
+      <a href="reports.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Reports</a>
+      <a href="settings.html" style="color: var(--color-primary); text-decoration: none; font-weight: var(--weight-bold); font-size: var(--text-sm);">Settings</a>
       <div style="width: 1px; height: 16px; background: var(--color-border); margin: 0 var(--space-2);"></div>
-      <a href="login.html"
-        style="color: var(--color-danger); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Logout</a>
+      <a href="#" id="navLogout" style="color: var(--color-danger); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Logout</a>
     </div>
   </nav>
 
@@ -163,7 +115,6 @@
       <header id="appTopbar" class="topbar"></header>
 
       <div class="page-content">
-
         <div class="settings-container">
 
           <div class="settings-section">
@@ -171,11 +122,11 @@
             <form id="profileForm">
               <div class="form-group">
                 <label>Full Name</label>
-                <input type="text" id="profileName" class="form-control" value="">
+                <input type="text" id="profileName" class="form-control" placeholder="Your name">
               </div>
               <div class="form-group">
                 <label>Email</label>
-                <input type="email" id="profileEmail" class="form-control" value="" disabled
+                <input type="email" id="profileEmail" class="form-control" disabled
                   style="background: var(--color-border); cursor: not-allowed;">
               </div>
               <button type="button" id="saveProfileBtn" class="btn-primary">Save Changes</button>
@@ -187,8 +138,7 @@
             <div class="theme-toggle-row">
               <div>
                 <strong>Dark Mode</strong>
-                <p style="color: var(--color-text-muted); font-size: var(--text-sm); margin-top: 4px;">Switch to a dark
-                  color scheme.</p>
+                <p style="color: var(--color-text-muted); font-size: var(--text-sm); margin-top: 4px;">Switch to a dark color scheme.</p>
               </div>
               <label class="switch">
                 <input type="checkbox" id="darkModeToggle">
@@ -198,28 +148,35 @@
             <div class="theme-toggle-row">
               <div>
                 <strong>Email Notifications</strong>
-                <p style="color: var(--color-text-muted); font-size: var(--text-sm); margin-top: 4px;">Receive weekly
-                  summary reports.</p>
+                <p style="color: var(--color-text-muted); font-size: var(--text-sm); margin-top: 4px;">Receive weekly summary reports.</p>
               </div>
               <label class="switch">
-                <input type="checkbox" checked>
+                <input type="checkbox" id="notifToggle" checked>
                 <span class="slider"></span>
               </label>
             </div>
           </div>
 
           <div class="settings-section">
+            <h3>Data Management</h3>
+            <p style="color: var(--color-text-muted); margin-bottom: var(--space-4);">Export your data or clear all transactions.</p>
+            <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;">
+              <button type="button" id="clearDataBtn" class="btn-primary" style="background: var(--color-warning); color: var(--color-ink);">Clear All Transactions</button>
+            </div>
+          </div>
+
+          <div class="settings-section">
             <h3>Danger Zone</h3>
-            <p style="color: var(--color-text-muted); margin-bottom: var(--space-4);">Once you delete your account,
-              there is no going back. Please be certain.</p>
-            <button type="button" class="btn-primary" style="background: var(--color-danger);">Delete Account</button>
+            <p style="color: var(--color-text-muted); margin-bottom: var(--space-4);">Once you delete your account, there is no going back. Please be certain.</p>
+            <button type="button" id="deleteAccountBtn" class="btn-primary" style="background: var(--color-danger);">Delete Account</button>
           </div>
 
         </div>
-
       </div>
     </main>
   </div>
+
+  <div id="toastMsg" class="toast-msg"></div>
 
   <script type="module">
     import { AppContainer } from './JS/core.js';
@@ -228,42 +185,74 @@
 
     AppContainer.get('authService').requireAuth();
 
-    const authService = AppContainer.get('authService');
+    const authService     = AppContainer.get('authService');
     const settingsService = AppContainer.get('settingsService');
 
     new SidebarComponent('#appSidebar', authService, 'settings').mount();
     new TopbarComponent('#appTopbar', { title: 'Settings', subtitle: 'Manage your account' }).mount();
 
-    // Profile Logic
+    document.getElementById('navLogout').addEventListener('click', (e) => {
+      e.preventDefault();
+      authService.logout();
+    });
+
+    function showToast(msg, color = 'var(--color-success)') {
+      const el = document.getElementById('toastMsg');
+      el.textContent = msg;
+      el.style.background = color;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 3000);
+    }
+
+    // Profile
     const user = authService.currentUser;
     if (user) {
-      document.getElementById('profileName').value = user.name;
+      document.getElementById('profileName').value  = user.name;
       document.getElementById('profileEmail').value = user.email;
     }
 
     document.getElementById('saveProfileBtn').addEventListener('click', () => {
-      const newName = document.getElementById('profileName').value;
+      const newName = document.getElementById('profileName').value.trim();
+      if (!newName) { showToast('Name cannot be empty', 'var(--color-danger)'); return; }
       try {
         authService.updateProfile({ name: newName });
-        alert('Profile Updated successfully!');
-        window.location.reload(); // Refresh to update UI components
+        showToast('Profile updated successfully!');
       } catch (err) {
-        alert(err.message || 'An error occurred');
+        showToast(err.message || 'An error occurred', 'var(--color-danger)');
       }
     });
 
-    // Dark Mode Toggle Logic
+    // Dark Mode
     const toggle = document.getElementById('darkModeToggle');
-
-    if (settingsService.current.theme === 'dark') {
-      toggle.checked = true;
-    }
-
+    toggle.checked = settingsService.current.theme === 'dark';
     toggle.addEventListener('change', (e) => {
-      const theme = e.target.checked ? 'dark' : 'light';
-      settingsService.update({ theme });
+      settingsService.update({ theme: e.target.checked ? 'dark' : 'light' });
+    });
+
+    // Notifications
+    const notifToggle = document.getElementById('notifToggle');
+    notifToggle.checked = settingsService.current.notifications !== false;
+    notifToggle.addEventListener('change', (e) => {
+      settingsService.update({ notifications: e.target.checked });
+    });
+
+    // Clear transactions
+    document.getElementById('clearDataBtn').addEventListener('click', () => {
+      if (confirm('This will delete ALL your transactions. Are you sure?')) {
+        AppContainer.get('expenseService').getAll().forEach(tx => {
+          try { AppContainer.get('expenseService').delete(tx.id); } catch(e) {}
+        });
+        showToast('All transactions cleared.');
+      }
+    });
+
+    // Delete account
+    document.getElementById('deleteAccountBtn').addEventListener('click', () => {
+      if (confirm('Delete your account permanently? This cannot be undone.')) {
+        AppContainer.get('storage').clear();
+        window.location.href = 'login.html';
+      }
     });
   </script>
 </body>
-
 </html>

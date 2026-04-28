@@ -16,7 +16,7 @@
   <style>
     .dashboard-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: var(--space-6);
       margin-bottom: var(--space-8);
     }
@@ -44,6 +44,7 @@
     .stat-card.coral .value { color: var(--color-coral); }
     .stat-card.blue .value { color: var(--color-blue); }
     .stat-card.yellow .value { color: var(--color-yellow-dark); }
+    .stat-card.green .value { color: var(--color-success); }
     
     .chart-container {
       background: var(--color-surface);
@@ -71,45 +72,17 @@
       font-family: var(--font-display);
       font-size: var(--text-xl);
     }
-    .transaction-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
+    .recent-transactions .view-all {
+      font-size: var(--text-sm);
+      color: var(--color-accent);
+      font-weight: var(--weight-medium);
+      text-decoration: none;
     }
-    .transaction-item {
+    .recent-transactions .header-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: var(--space-4) 0;
-      border-bottom: 1px solid var(--color-border);
-    }
-    .transaction-item:last-child {
-      border-bottom: none;
-    }
-    .tx-info {
-      display: flex;
-      align-items: center;
-      gap: var(--space-4);
-    }
-    .tx-icon {
-      width: 48px;
-      height: 48px;
-      background: var(--color-blue-subtle);
-      border-radius: var(--radius-md);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: var(--text-xl);
-    }
-    .tx-details h4 {
-      margin: 0;
-      color: var(--color-text);
-      font-weight: var(--weight-medium);
-    }
-    .tx-details p {
-      margin: 0;
-      color: var(--color-text-muted);
-      font-size: var(--text-sm);
+      margin-bottom: var(--space-4);
     }
     .tx-amount {
       font-weight: var(--weight-bold);
@@ -118,6 +91,15 @@
     .tx-amount.income {
       color: var(--color-success);
     }
+    .empty-state {
+      padding: var(--space-8);
+      text-align: center;
+      color: var(--color-text-muted);
+    }
+    .empty-state a {
+      color: var(--color-primary);
+      font-weight: var(--weight-semibold);
+    }
   </style>
 </head>
 <body>
@@ -125,13 +107,13 @@
   <nav style="position: absolute; top: 0; left: 0; width: 100%; height: 64px; padding: 0 var(--space-8); display: flex; justify-content: space-between; align-items: center; background: var(--color-surface); backdrop-filter: blur(8px); border-bottom: 1px solid var(--color-border); z-index: 1000;">
     <div style="font-family: var(--font-display); font-size: var(--text-xl); font-weight: var(--weight-bold); color: var(--color-text);">💸 Masroofy</div>
     <div style="display: flex; gap: var(--space-4); align-items: center; flex-wrap: wrap; justify-content: flex-end;">
-      <a href="dashboard.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Dashboard</a>
+      <a href="dashboard.html" style="color: var(--color-primary); text-decoration: none; font-weight: var(--weight-bold); font-size: var(--text-sm);">Dashboard</a>
       <a href="add_expense.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Add Expense</a>
       <a href="history.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">History</a>
       <a href="reports.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Reports</a>
       <a href="settings.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Settings</a>
       <div style="width: 1px; height: 16px; background: var(--color-border); margin: 0 var(--space-2);"></div>
-      <a href="login.html" style="color: var(--color-danger); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Logout</a>
+      <a href="#" id="navLogout" style="color: var(--color-danger); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Logout</a>
     </div>
   </nav>
 
@@ -155,6 +137,10 @@
             <h3>Monthly Income</h3>
             <div class="value" id="monthlyIncome">$0.00</div>
           </div>
+          <div class="stat-card green">
+            <h3>Savings Rate</h3>
+            <div class="value" id="savingsRate">0%</div>
+          </div>
         </div>
         
         <div class="dashboard-grid">
@@ -169,10 +155,11 @@
         </div>
 
         <div class="recent-transactions">
-          <h3>Recent Transactions</h3>
-          <ul class="transaction-list" id="recentTransactionsList">
-            <!-- Dynamic transactions will load here -->
-          </ul>
+          <div class="header-row">
+            <h3 style="margin-bottom: 0;">Recent Transactions</h3>
+            <a href="history.html" class="view-all">View all →</a>
+          </div>
+          <ul style="list-style:none;padding:0;margin:0;" id="recentTransactionsList"></ul>
         </div>
       </div>
     </main>
@@ -187,32 +174,40 @@
     
     new SidebarComponent('#appSidebar', AppContainer.get('authService'), 'dashboard').mount();
     new TopbarComponent('#appTopbar', { title: 'Dashboard', subtitle: 'Here is your money at a glance' }).mount();
+
+    // Logout
+    document.getElementById('navLogout').addEventListener('click', (e) => {
+      e.preventDefault();
+      AppContainer.get('authService').logout();
+    });
     
     // Services
-    const reportService = AppContainer.get('reportService');
+    const reportService  = AppContainer.get('reportService');
     const expenseService = AppContainer.get('expenseService');
-    const formatter = AppContainer.get('formatter');
+    const formatter      = AppContainer.get('formatter');
     
-    // Fetch data
-    const now = new Date();
-    let allExpenses = expenseService.getAll();
-    
-    // Auto-populate some initial data if empty so the charts aren't blank!
-    if (allExpenses.length === 0) {
-      expenseService.add({ amount: 1500, category: 'other', date: new Date().toISOString(), type: 'income', note: 'Allowance' });
-      expenseService.add({ amount: 25, category: 'food', date: new Date().toISOString(), type: 'expense', note: 'Lunch' });
-      expenseService.add({ amount: 10, category: 'transport', date: new Date().toISOString(), type: 'expense', note: 'Bus ticket' });
-      expenseService.add({ amount: 60, category: 'shopping', date: new Date().toISOString(), type: 'expense', note: 'New shoes' });
-      window.location.reload();
+    // Auto-populate sample data only once (use a flag to prevent loops)
+    const allExpenses = expenseService.getAll();
+    if (allExpenses.length === 0 && !sessionStorage.getItem('demo_seeded')) {
+      sessionStorage.setItem('demo_seeded', '1');
+      const today = new Date().toISOString().split('T')[0];
+      expenseService.add({ amount: 1500, category: 'other', date: today, type: 'income',  description: 'Allowance', note: 'Monthly allowance' });
+      expenseService.add({ amount: 25,   category: 'food',  date: today, type: 'expense', description: 'Lunch',     note: 'Lunch with friends' });
+      expenseService.add({ amount: 10,   category: 'transport', date: today, type: 'expense', description: 'Bus', note: 'Bus ticket' });
+      expenseService.add({ amount: 60,   category: 'shopping',  date: today, type: 'expense', description: 'Shoes', note: 'New shoes' });
     }
     
+    const now  = new Date();
     const data = reportService.monthly(now.getFullYear(), now.getMonth() + 1);
-    const overallTotals = expenseService.totals(allExpenses);
+    const all  = expenseService.getAll();
+    const overallTotals = expenseService.totals(all);
+    const savingsRate   = reportService.savingsRate(now.getFullYear(), now.getMonth() + 1);
     
-    // Update Stats
+    // Update stat cards
     document.getElementById('currentBalance').textContent = formatter.money(overallTotals.net);
-    document.getElementById('monthlyIncome').textContent = formatter.money(data.totals.income);
-    document.getElementById('monthlySpent').textContent = formatter.money(data.totals.expenses);
+    document.getElementById('monthlyIncome').textContent  = formatter.money(data.totals.income);
+    document.getElementById('monthlySpent').textContent   = formatter.money(data.totals.expenses);
+    document.getElementById('savingsRate').textContent    = savingsRate + '%';
     
     // Charts
     const overviewCanvas = document.getElementById('overviewChart');
@@ -225,8 +220,7 @@
     
     const categoryCanvas = document.getElementById('categoryChart');
     const categories = Array.from(data.byCategory.keys());
-    const amounts = Array.from(data.byCategory.values()).map(v => v.total);
-    
+    const amounts    = Array.from(data.byCategory.values()).map(v => v.total);
     if (categoryCanvas && categories.length > 0) {
       ChartFactory.donut(categoryCanvas, {
         labels: categories.map(c => c.charAt(0).toUpperCase() + c.slice(1)),
@@ -234,38 +228,38 @@
       });
     }
     
-    // Recent Transactions
+    // Recent Transactions (last 5)
     const recentList = document.getElementById('recentTransactionsList');
-    const recentTx = allExpenses.slice(0, 3);
+    const recentTx   = all.slice(0, 5);
     
     const icons = {
-      food: { icon: '🍔', bg: 'var(--color-coral-subtle)' },
-      transport: { icon: '🚌', bg: 'var(--color-blue-subtle)' },
+      food:          { icon: '🍔', bg: 'var(--color-coral-subtle)' },
+      transport:     { icon: '🚌', bg: 'var(--color-blue-subtle)' },
       entertainment: { icon: '🍿', bg: 'var(--color-yellow-subtle)' },
-      shopping: { icon: '🛍️', bg: 'var(--color-success-subtle)' },
-      bills: { icon: '💡', bg: 'var(--color-info-subtle)' },
-      other: { icon: '✨', bg: 'var(--color-surface-2)' },
+      shopping:      { icon: '🛍️', bg: 'var(--color-success-subtle)' },
+      bills:         { icon: '💡', bg: 'var(--color-info-subtle)' },
+      other:         { icon: '✨', bg: 'var(--color-surface-2)' },
     };
     
     if (recentTx.length === 0) {
-      recentList.innerHTML = '<div style="padding: var(--space-4); color: var(--color-text-muted);">No recent transactions.</div>';
+      recentList.innerHTML = `<div class="empty-state">No transactions yet. <a href="add_expense.html">Add one now!</a></div>`;
     } else {
       recentList.innerHTML = recentTx.map(tx => {
-        const style = icons[tx.category] || icons.other;
+        const style      = icons[tx.category] || icons.other;
         const amountClass = tx.type === 'income' ? 'income' : '';
-        const sign = tx.type === 'income' ? '+' : '-';
+        const sign       = tx.type === 'income' ? '+' : '-';
+        const label      = tx.note || tx.description || tx.category;
         return `
-          <li class="transaction-item" style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-4) 0; border-bottom: 1px solid var(--color-border);">
-            <div class="tx-info" style="display: flex; align-items: center; gap: var(--space-3);">
-              <div class="tx-icon" style="width: 40px; height: 40px; border-radius: var(--radius-full); background: ${style.bg}; display: flex; align-items: center; justify-content: center; font-size: var(--text-lg);">${style.icon}</div>
-              <div class="tx-details">
-                <h4 style="margin: 0; font-weight: var(--weight-medium);">${tx.category.charAt(0).toUpperCase() + tx.category.slice(1)}</h4>
-                <p style="margin: 0; font-size: var(--text-sm); color: var(--color-text-muted);">${formatter.relativeDate(tx.date)}</p>
+          <li style="display:flex;justify-content:space-between;align-items:center;padding:var(--space-4) 0;border-bottom:1px solid var(--color-border);">
+            <div style="display:flex;align-items:center;gap:var(--space-3);">
+              <div style="width:40px;height:40px;border-radius:var(--radius-full);background:${style.bg};display:flex;align-items:center;justify-content:center;font-size:var(--text-lg);">${style.icon}</div>
+              <div>
+                <div style="font-weight:var(--weight-medium);color:var(--color-text);">${tx.category.charAt(0).toUpperCase() + tx.category.slice(1)}</div>
+                <div style="font-size:var(--text-sm);color:var(--color-text-muted);">${label} · ${formatter.relativeDate(tx.date)}</div>
               </div>
             </div>
-            <div class="tx-amount ${amountClass}" style="font-weight: var(--weight-bold);">${sign}${formatter.money(tx.amount)}</div>
-          </li>
-        `;
+            <div class="tx-amount ${amountClass}">${sign}${formatter.money(tx.amount)}</div>
+          </li>`;
       }).join('');
     }
   </script>

@@ -16,10 +16,11 @@ import { BaseModel, ValidationError } from './core.js';
 
 /** @readonly Predefined expense categories */
 const CATEGORIES = Object.freeze([
-  { id: 'food',          label: 'Food & Dining',   emoji: '🍽️',  color: '#FF6F61' },
-  { id: 'transport',     label: 'Transport',        emoji: '🚗',  color: '#007BFF' },
+  { id: 'food',          label: 'Food & Dining',   emoji: '🍔',  color: '#FF6F61' },
+  { id: 'transport',     label: 'Transport',        emoji: '🚌',  color: '#007BFF' },
   { id: 'shopping',      label: 'Shopping',         emoji: '🛍️',  color: '#FFD700' },
-  { id: 'entertainment', label: 'Entertainment',    emoji: '🎬',  color: '#9B59B6' },
+  { id: 'entertainment', label: 'Entertainment',    emoji: '🍿',  color: '#9B59B6' },
+  { id: 'bills',         label: 'Bills',            emoji: '💡',  color: '#E67E22' },
   { id: 'health',        label: 'Health',           emoji: '💊',  color: '#2ECC71' },
   { id: 'utilities',     label: 'Utilities',        emoji: '💡',  color: '#E67E22' },
   { id: 'rent',          label: 'Rent & Housing',   emoji: '🏠',  color: '#1ABC9C' },
@@ -27,7 +28,7 @@ const CATEGORIES = Object.freeze([
   { id: 'travel',        label: 'Travel',           emoji: '✈️',  color: '#E74C3C' },
   { id: 'savings',       label: 'Savings',          emoji: '💰',  color: '#27AE60' },
   { id: 'income',        label: 'Income',           emoji: '💵',  color: '#2ECC71' },
-  { id: 'other',         label: 'Other',            emoji: '📦',  color: '#95A5A6' },
+  { id: 'other',         label: 'Other',            emoji: '✨',  color: '#95A5A6' },
 ]);
 
 /**
@@ -160,8 +161,7 @@ class Expense extends BaseModel {
   validate() {
     const errors = [];
     if (this.#amount <= 0)            errors.push('Amount must be greater than zero.');
-    if (!this.#description)           errors.push('Description is required.');
-    if (this.#description.length > 100) errors.push('Description must be 100 characters or less.');
+    if (this.#description && this.#description.length > 100) errors.push('Description must be 100 characters or less.');
     if (!this.#date)                  errors.push('Date is required.');
     if (!Categories.find(this.#category)) errors.push(`Unknown category: ${this.#category}.`);
     return { valid: errors.length === 0, errors };

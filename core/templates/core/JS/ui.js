@@ -740,8 +740,6 @@ class ChartFactory {
    WIRE UP SERVICES IN CONTAINER
    ============================================================ */
 
-import { AppContainer } from './core.js';
-
 AppContainer.register('toast',  () => new ToastManager());
 AppContainer.register('modal',  () => new ModalManager());
 

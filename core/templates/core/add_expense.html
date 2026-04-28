@@ -45,33 +45,8 @@
       border-color: var(--color-primary);
       background: var(--color-surface);
     }
-    .category-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      gap: var(--space-3);
-    }
-    .category-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: var(--space-2);
-      padding: var(--space-3);
-      border: 2px solid var(--color-border);
-      border-radius: var(--radius-md);
-      cursor: pointer;
-      transition: all var(--duration-fast);
-      text-align: center;
-    }
-    .category-item:hover {
-      background: var(--color-surface-2);
-    }
-    .category-item.selected {
-      border-color: var(--color-primary);
-      background: var(--color-coral-subtle);
-      color: var(--color-primary);
-    }
-    .category-icon {
-      font-size: var(--text-2xl);
+    .form-control.error {
+      border-color: var(--color-danger);
     }
     .btn-primary {
       width: 100%;
@@ -99,12 +74,12 @@
     <div style="font-family: var(--font-display); font-size: var(--text-xl); font-weight: var(--weight-bold); color: var(--color-text);">💸 Masroofy</div>
     <div style="display: flex; gap: var(--space-4); align-items: center; flex-wrap: wrap; justify-content: flex-end;">
       <a href="dashboard.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Dashboard</a>
-      <a href="add_expense.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Add Expense</a>
+      <a href="add_expense.html" style="color: var(--color-primary); text-decoration: none; font-weight: var(--weight-bold); font-size: var(--text-sm);">Add Expense</a>
       <a href="history.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">History</a>
       <a href="reports.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Reports</a>
       <a href="settings.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Settings</a>
       <div style="width: 1px; height: 16px; background: var(--color-border); margin: 0 var(--space-2);"></div>
-      <a href="login.html" style="color: var(--color-danger); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Logout</a>
+      <a href="#" id="navLogout" style="color: var(--color-danger); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Logout</a>
     </div>
   </nav>
 
@@ -120,6 +95,14 @@
             <div class="form-group">
               <label for="amount">Amount ($)</label>
               <input type="number" step="0.01" id="amount" name="amount" class="form-control" placeholder="0.00" required>
+            </div>
+
+            <div class="form-group">
+              <label for="type">Type</label>
+              <select id="type" name="type" class="form-control">
+                <option value="expense">💸 Expense</option>
+                <option value="income">💰 Income</option>
+              </select>
             </div>
             
             <div class="form-group">
@@ -144,7 +127,7 @@
               <input type="text" id="note" name="note" class="form-control" placeholder="e.g. Lunch with friends">
             </div>
             
-            <button type="submit" class="btn-primary">Add Expense 💸</button>
+            <button type="submit" class="btn-primary">Add Transaction 💸</button>
           </form>
         </div>
       </div>
@@ -160,11 +143,15 @@
     
     new SidebarComponent('#appSidebar', AppContainer.get('authService'), 'add_expense').mount();
     new TopbarComponent('#appTopbar', { title: 'Add Expense', subtitle: 'Track where your money goes' }).mount();
+
+    // Logout
+    document.getElementById('navLogout').addEventListener('click', (e) => {
+      e.preventDefault();
+      AppContainer.get('authService').logout();
+    });
     
     // Set today's date as default
     document.getElementById('date').valueAsDate = new Date();
-
-    // No custom category script needed anymore since we use a select dropdown
 
     // Form submission
     const form = document.getElementById('expenseForm');
@@ -196,10 +183,12 @@
             amount: Number(values.amount),
             category: values.category,
             date: values.date,
-            note: values.note,
-            type: 'expense'
+            note: values.note || '',
+            description: values.note || values.category, // required field mapped from note
+            type: values.type || 'expense'
           });
-          toast.success(`Successfully added $${values.amount} for ${values.category}!`, 'Expense Added');
+          const label = values.type === 'income' ? 'income' : 'expense';
+          toast.success(`Successfully added $${Number(values.amount).toFixed(2)} ${label}!`, 'Transaction Added');
           form.reset();
           document.getElementById('date').valueAsDate = new Date();
         } catch (err) {
