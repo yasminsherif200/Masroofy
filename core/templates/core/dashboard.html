@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Masroofy - Dashboard</title>
+  
+  <link rel="stylesheet" href="CSS/reset.css">
+  <link rel="stylesheet" href="CSS/variables.css">
+  <link rel="stylesheet" href="CSS/layout.css">
+  <link rel="stylesheet" href="CSS/components.css">
+  <link rel="stylesheet" href="CSS/pages.css">
+  <link rel="stylesheet" href="CSS/main.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <style>
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--space-6);
+      margin-bottom: var(--space-8);
+    }
+    .stat-card {
+      background: var(--color-surface);
+      padding: var(--space-6);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    .stat-card h3 {
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .stat-card .value {
+      font-size: var(--text-3xl);
+      font-family: var(--font-display);
+      font-weight: var(--weight-bold);
+      color: var(--color-text);
+    }
+    .stat-card.coral .value { color: var(--color-coral); }
+    .stat-card.blue .value { color: var(--color-blue); }
+    .stat-card.yellow .value { color: var(--color-yellow-dark); }
+    
+    .chart-container {
+      background: var(--color-surface);
+      padding: var(--space-6);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+    }
+    .chart-container h3 {
+      margin-bottom: var(--space-4);
+      color: var(--color-text);
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+    }
+    
+    .recent-transactions {
+      background: var(--color-surface);
+      padding: var(--space-6);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+      margin-top: var(--space-6);
+    }
+    .recent-transactions h3 {
+      margin-bottom: var(--space-4);
+      color: var(--color-text);
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+    }
+    .transaction-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .transaction-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-4) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .transaction-item:last-child {
+      border-bottom: none;
+    }
+    .tx-info {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+    }
+    .tx-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--color-blue-subtle);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-xl);
+    }
+    .tx-details h4 {
+      margin: 0;
+      color: var(--color-text);
+      font-weight: var(--weight-medium);
+    }
+    .tx-details p {
+      margin: 0;
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
+    }
+    .tx-amount {
+      font-weight: var(--weight-bold);
+      color: var(--color-danger);
+    }
+    .tx-amount.income {
+      color: var(--color-success);
+    }
+  </style>
+</head>
+<body>
+  <!-- Global Navbar -->
+  <nav style="position: absolute; top: 0; left: 0; width: 100%; height: 64px; padding: 0 var(--space-8); display: flex; justify-content: space-between; align-items: center; background: var(--color-surface); backdrop-filter: blur(8px); border-bottom: 1px solid var(--color-border); z-index: 1000;">
+    <div style="font-family: var(--font-display); font-size: var(--text-xl); font-weight: var(--weight-bold); color: var(--color-text);">💸 Masroofy</div>
+    <div style="display: flex; gap: var(--space-4); align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+      <a href="dashboard.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Dashboard</a>
+      <a href="add_expense.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Add Expense</a>
+      <a href="history.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">History</a>
+      <a href="reports.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Reports</a>
+      <a href="settings.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Settings</a>
+      <div style="width: 1px; height: 16px; background: var(--color-border); margin: 0 var(--space-2);"></div>
+      <a href="login.html" style="color: var(--color-danger); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Logout</a>
+    </div>
+  </nav>
+
+  <div class="app-container" style="padding-top: 64px; height: calc(100vh - 64px);">
+    <aside id="appSidebar" class="sidebar"></aside>
+
+    <main class="main-content">
+      <header id="appTopbar" class="topbar"></header>
+
+      <div class="page-content">
+        <div class="dashboard-grid">
+          <div class="stat-card blue">
+            <h3>Current Balance</h3>
+            <div class="value" id="currentBalance">$0.00</div>
+          </div>
+          <div class="stat-card coral">
+            <h3>Monthly Spent</h3>
+            <div class="value" id="monthlySpent">$0.00</div>
+          </div>
+          <div class="stat-card yellow">
+            <h3>Monthly Income</h3>
+            <div class="value" id="monthlyIncome">$0.00</div>
+          </div>
+        </div>
+        
+        <div class="dashboard-grid">
+          <div class="chart-container">
+            <h3>Spending Overview</h3>
+            <canvas id="overviewChart"></canvas>
+          </div>
+          <div class="chart-container">
+            <h3>By Category</h3>
+            <canvas id="categoryChart"></canvas>
+          </div>
+        </div>
+
+        <div class="recent-transactions">
+          <h3>Recent Transactions</h3>
+          <ul class="transaction-list" id="recentTransactionsList">
+            <!-- Dynamic transactions will load here -->
+          </ul>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { AppContainer } from './JS/core.js';
+    import { SidebarComponent, TopbarComponent, ChartFactory } from './JS/ui.js';
+    import './JS/services.js';
+    
+    AppContainer.get('authService').requireAuth();
+    
+    new SidebarComponent('#appSidebar', AppContainer.get('authService'), 'dashboard').mount();
+    new TopbarComponent('#appTopbar', { title: 'Dashboard', subtitle: 'Here is your money at a glance' }).mount();
+    
+    // Services
+    const reportService = AppContainer.get('reportService');
+    const expenseService = AppContainer.get('expenseService');
+    const formatter = AppContainer.get('formatter');
+    
+    // Fetch data
+    const now = new Date();
+    let allExpenses = expenseService.getAll();
+    
+    // Auto-populate some initial data if empty so the charts aren't blank!
+    if (allExpenses.length === 0) {
+      expenseService.add({ amount: 1500, category: 'other', date: new Date().toISOString(), type: 'income', note: 'Allowance' });
+      expenseService.add({ amount: 25, category: 'food', date: new Date().toISOString(), type: 'expense', note: 'Lunch' });
+      expenseService.add({ amount: 10, category: 'transport', date: new Date().toISOString(), type: 'expense', note: 'Bus ticket' });
+      expenseService.add({ amount: 60, category: 'shopping', date: new Date().toISOString(), type: 'expense', note: 'New shoes' });
+      window.location.reload();
+    }
+    
+    const data = reportService.monthly(now.getFullYear(), now.getMonth() + 1);
+    const overallTotals = expenseService.totals(allExpenses);
+    
+    // Update Stats
+    document.getElementById('currentBalance').textContent = formatter.money(overallTotals.net);
+    document.getElementById('monthlyIncome').textContent = formatter.money(data.totals.income);
+    document.getElementById('monthlySpent').textContent = formatter.money(data.totals.expenses);
+    
+    // Charts
+    const overviewCanvas = document.getElementById('overviewChart');
+    if (overviewCanvas && data.byDay.labels.length > 0) {
+      ChartFactory.line(overviewCanvas, {
+        labels: data.byDay.labels,
+        datasets: [{ label: 'Spent ($)', data: data.byDay.amounts }]
+      });
+    }
+    
+    const categoryCanvas = document.getElementById('categoryChart');
+    const categories = Array.from(data.byCategory.keys());
+    const amounts = Array.from(data.byCategory.values()).map(v => v.total);
+    
+    if (categoryCanvas && categories.length > 0) {
+      ChartFactory.donut(categoryCanvas, {
+        labels: categories.map(c => c.charAt(0).toUpperCase() + c.slice(1)),
+        data: amounts
+      });
+    }
+    
+    // Recent Transactions
+    const recentList = document.getElementById('recentTransactionsList');
+    const recentTx = allExpenses.slice(0, 3);
+    
+    const icons = {
+      food: { icon: '🍔', bg: 'var(--color-coral-subtle)' },
+      transport: { icon: '🚌', bg: 'var(--color-blue-subtle)' },
+      entertainment: { icon: '🍿', bg: 'var(--color-yellow-subtle)' },
+      shopping: { icon: '🛍️', bg: 'var(--color-success-subtle)' },
+      bills: { icon: '💡', bg: 'var(--color-info-subtle)' },
+      other: { icon: '✨', bg: 'var(--color-surface-2)' },
+    };
+    
+    if (recentTx.length === 0) {
+      recentList.innerHTML = '<div style="padding: var(--space-4); color: var(--color-text-muted);">No recent transactions.</div>';
+    } else {
+      recentList.innerHTML = recentTx.map(tx => {
+        const style = icons[tx.category] || icons.other;
+        const amountClass = tx.type === 'income' ? 'income' : '';
+        const sign = tx.type === 'income' ? '+' : '-';
+        return `
+          <li class="transaction-item" style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-4) 0; border-bottom: 1px solid var(--color-border);">
+            <div class="tx-info" style="display: flex; align-items: center; gap: var(--space-3);">
+              <div class="tx-icon" style="width: 40px; height: 40px; border-radius: var(--radius-full); background: ${style.bg}; display: flex; align-items: center; justify-content: center; font-size: var(--text-lg);">${style.icon}</div>
+              <div class="tx-details">
+                <h4 style="margin: 0; font-weight: var(--weight-medium);">${tx.category.charAt(0).toUpperCase() + tx.category.slice(1)}</h4>
+                <p style="margin: 0; font-size: var(--text-sm); color: var(--color-text-muted);">${formatter.relativeDate(tx.date)}</p>
+              </div>
+            </div>
+            <div class="tx-amount ${amountClass}" style="font-weight: var(--weight-bold);">${sign}${formatter.money(tx.amount)}</div>
+          </li>
+        `;
+      }).join('');
+    }
+  </script>
+</body>
+</html>

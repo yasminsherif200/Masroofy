@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Masroofy - Reports</title>
+  
+  <link rel="stylesheet" href="CSS/reset.css">
+  <link rel="stylesheet" href="CSS/variables.css">
+  <link rel="stylesheet" href="CSS/layout.css">
+  <link rel="stylesheet" href="CSS/components.css">
+  <link rel="stylesheet" href="CSS/pages.css">
+  <link rel="stylesheet" href="CSS/main.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <style>
+    .reports-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+    }
+    @media (min-width: 992px) {
+      .reports-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .chart-full-width {
+        grid-column: 1 / -1;
+      }
+    }
+    .chart-card {
+      background: var(--color-surface);
+      padding: var(--space-6);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+    }
+    .chart-card h3 {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      color: var(--color-text);
+      margin-bottom: var(--space-4);
+    }
+    .reports-header {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: var(--space-6);
+    }
+    .period-select {
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-full);
+      border: 2px solid var(--color-border);
+      background: var(--color-surface);
+      font-weight: var(--weight-bold);
+      color: var(--color-text);
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <!-- Global Navbar -->
+  <nav style="position: absolute; top: 0; left: 0; width: 100%; height: 64px; padding: 0 var(--space-8); display: flex; justify-content: space-between; align-items: center; background: var(--color-surface); backdrop-filter: blur(8px); border-bottom: 1px solid var(--color-border); z-index: 1000;">
+    <div style="font-family: var(--font-display); font-size: var(--text-xl); font-weight: var(--weight-bold); color: var(--color-text);">💸 Masroofy</div>
+    <div style="display: flex; gap: var(--space-4); align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+      <a href="dashboard.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Dashboard</a>
+      <a href="add_expense.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Add Expense</a>
+      <a href="history.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">History</a>
+      <a href="reports.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Reports</a>
+      <a href="settings.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Settings</a>
+      <div style="width: 1px; height: 16px; background: var(--color-border); margin: 0 var(--space-2);"></div>
+      <a href="login.html" style="color: var(--color-danger); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Logout</a>
+    </div>
+  </nav>
+
+  <div class="app-container" style="padding-top: 64px; height: calc(100vh - 64px);">
+    <aside id="appSidebar" class="sidebar"></aside>
+
+    <main class="main-content">
+      <header id="appTopbar" class="topbar"></header>
+
+      <div class="page-content">
+        
+        <div class="reports-header">
+          <select class="period-select">
+            <option>Last 7 Days</option>
+            <option selected>This Month</option>
+            <option>Last Month</option>
+            <option>This Year</option>
+          </select>
+        </div>
+
+        <div class="reports-grid">
+          
+          <div class="chart-card chart-full-width">
+            <h3>Income vs Expenses</h3>
+            <canvas id="incomeExpenseChart" height="100"></canvas>
+          </div>
+          
+          <div class="chart-card">
+            <h3>Spending by Category</h3>
+            <canvas id="categoryDonutChart"></canvas>
+          </div>
+          
+          <div class="chart-card">
+            <h3>Daily Average</h3>
+            <canvas id="dailyBarChart"></canvas>
+          </div>
+          
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { AppContainer } from './JS/core.js';
+    import { SidebarComponent, TopbarComponent, ChartFactory } from './JS/ui.js';
+    import './JS/services.js';
+    
+    AppContainer.get('authService').requireAuth();
+    
+    new SidebarComponent('#appSidebar', AppContainer.get('authService'), 'reports').mount();
+    new TopbarComponent('#appTopbar', { title: 'Reports', subtitle: 'Analyze your spending habits' }).mount();
+
+    const reportService = AppContainer.get('reportService');
+    const now = new Date();
+    
+    // Fetch data
+    const monthlyData = reportService.monthly(now.getFullYear(), now.getMonth() + 1);
+    const yearlyData = reportService.yearlyTrend();
+    
+    setTimeout(() => {
+      // Income vs Expenses Trend
+      if (yearlyData.labels.length > 0) {
+        ChartFactory.line(document.getElementById('incomeExpenseChart'), {
+          labels: yearlyData.labels,
+          datasets: [
+            { label: 'Income', data: yearlyData.income, borderColor: '#2ECC71', backgroundColor: 'rgba(46, 204, 113, 0.1)' },
+            { label: 'Expenses', data: yearlyData.expenses, borderColor: '#FF6F61', backgroundColor: 'rgba(255, 111, 97, 0.1)' }
+          ]
+        });
+      }
+
+      // Spending by Category
+      const categories = Array.from(monthlyData.byCategory.keys());
+      const amounts = Array.from(monthlyData.byCategory.values()).map(v => v.total);
+      
+      if (categories.length > 0) {
+        ChartFactory.donut(document.getElementById('categoryDonutChart'), {
+          labels: categories.map(c => c.charAt(0).toUpperCase() + c.slice(1)),
+          data: amounts
+        });
+      }
+
+      // Daily Average (This month's daily spending)
+      if (monthlyData.byDay.labels.length > 0) {
+        ChartFactory.bar(document.getElementById('dailyBarChart'), {
+          labels: monthlyData.byDay.labels,
+          datasets: [
+            { label: 'Spent', data: monthlyData.byDay.amounts }
+          ]
+        });
+      }
+    }, 100);
+  </script>
+</body>
+</html>
