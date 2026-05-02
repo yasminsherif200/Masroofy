@@ -1,50 +1,27 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Masroofy - Budgeting for the Youth</title>
-  
-  <!-- CSS Links -->
-  <link rel="stylesheet" href="CSS/reset.css">
-  <link rel="stylesheet" href="CSS/variables.css">
-  <link rel="stylesheet" href="CSS/layout.css">
-  <link rel="stylesheet" href="CSS/components.css">
-  <link rel="stylesheet" href="CSS/pages.css">
-  <link rel="stylesheet" href="CSS/main.css">
+    <title>Masroofy</title>
+    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
 </head>
 <body>
-  <div class="app-container">
-    <!-- Sidebar -->
-    <aside id="appSidebar" class="sidebar"></aside>
 
-    <!-- Main Content Area -->
-    <main class="main-content">
-      <!-- Topbar -->
-      <header id="appTopbar" class="topbar"></header>
+{% if request.session.user_id %}
+<nav class="navbar">
+    <div class="logo">Masroofy</div>
+    <ul class="nav-links">
+        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        
+        
+        <li><a href="{% url 'logout' %}">Logout</a></li>
+    </ul>
+</nav>
+{% endif %}
 
-      <!-- Page Content -->
-      <div class="page-content">
-        <!-- Content goes here -->
-        <div class="card">
-          <h2>Welcome to Masroofy! 🚀</h2>
-          <p>This is the base layout structure.</p>
-        </div>
-      </div>
-    </main>
-  </div>
+<div class="container">
+    {% block content %}{% endblock %}
+</div>
 
-  <!-- Script Modules -->
-  <script type="module">
-    import { AppContainer } from './JS/core.js';
-    import { SidebarComponent, TopbarComponent } from './JS/ui.js';
-    import './JS/services.js';
-    
-    AppContainer.get('authService').requireAuth();
-    
-    // Initialize UI
-    const sidebar = new SidebarComponent('#appSidebar', AppContainer.get('authService'), 'dashboard').mount();
-    const topbar = new TopbarComponent('#appTopbar', { title: 'Masroofy', subtitle: "Let's crush those budget goals!" }).mount();
-  </script>
 </body>
 </html>
