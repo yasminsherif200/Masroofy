@@ -65,3 +65,10 @@ def signup(request):
 def logout(request):
     request.session.flush()
     return redirect('login')
+
+def setup_placeholder(request):
+    return render(request, 'core/setup.html')
+
+
+def dashboard_placeholder(request):
+    return render(request, 'core/dashboard.html')
