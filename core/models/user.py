@@ -13,5 +13,3 @@ class User(models.Model):
     def __str__(self):
         return (f"User ID: {self.userID},\nUser Name: {self.userName}")
     
-    class Meta:
-        db_table = 'users'

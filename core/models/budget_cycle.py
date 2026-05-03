@@ -23,5 +23,3 @@ class BudgetCycle(models.Model):
     def __str__(self):
         return f"Cycle {self.cycleID} for {self.user.userName}"
     
-    class Meta:
-        db_table = 'budget_cycles'
