@@ -37,4 +37,10 @@ class UserService:
             self.handleFailedAttempts()
             return False
 
+    # called if user updated only the username without the pin
+    def updateUserName(self, userName):
+        user = self.userDAO.getUserSecurityData()
+        self.userDAO.saveUserCredentials(
+            userName, user.hashedPIN, True
+        )
     
