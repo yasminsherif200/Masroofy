@@ -14,28 +14,55 @@ def dashboard(request):
     if not active_cycle:
         return redirect('setup')
     
+
     daily_limit = budget_service.getSafeDailyLimit(active_cycle.cycleID)
+    # waiting for transaction_dao.py
+    # balance = budget_service.getCurrentBalance(active_cycle.cycleID)
+    # threshold_reached = budget_service.checkThreshold(active_cycle.cycleID)
+    remaining_days = budget_service.getRemainingDays(active_cycle.cycleID)
+    category_percentages = budget_service.calculateCategoryPercentages(active_cycle.cycleID)
+
+    return render(request, 'core/dashboard.html', {
+        'daily_limit': round(daily_limit, 2),
+        # 'balance': round(balance, 2),
+        'remaining_days': remaining_days,
+        # 'threshold_reached': threshold_reached,
+        'category_data': category_percentages,
+        'cycle': active_cycle,
+    })
 
 
-def home_view(request):
+def setup(request):
+    if not request.session.get('user_id'):
+        return redirect('login')
+    user_id = request.session.get('user_id')
+
+    if budget_dao.getActiveCycle(user_id):
+        return redirect('dashboard')
     
-    active_cycle = BudgetDAO.getActiveCycle(request.user.id)
-
     if request.method == 'POST':
         amount = request.POST.get('totalAllowance')
+        start_date = request.POST.get('startDate')
+        end_date = request.POST.get('endDate')
+
+        if not amount or not start_date or not end_date:
+            return render(request, 'core/setup.html', {
+                'error': 'All fields are required.'
+            })
         
-        #if user entered amount, create new budget cycle
-        if amount:
-            BudgetService.create_new_budget(
-                user=request.user, 
-                amount=float(amount)
-            )
-            return redirect('home')
-        
-    context = {
-        'active_cycle': active_cycle,
-        'user': request.user,
-        'has_active_budget': active_cycle is not None
-    }
+        from datetime import date
+        start = date.fromisoformat(start_date)
+        end = date.fromisoformat(end_date)
+
+        budget_service.createNewCycle(
+            float(amount), start, end
+        )
+
+        return redirect('dashboard')
     
-    return render(request, 'core/home.html', context)
+    return render(request, 'core/setup.html')
+
+
+
+
+
