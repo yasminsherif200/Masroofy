@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from ..services.budget_service import BudgetService
-from ..dao.budget_dao import BudgetDAO
+from core.services import BudgetService
+from core.dao import BudgetDAO
 
 @login_required # Ensure that only authenticated users can access the home view.
 def home_view(request):

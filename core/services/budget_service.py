@@ -1,5 +1,5 @@
-from ..dao.budget_dao import BudgetDAO
-from ..models.budget_cycle import BudgetCycle
+from core.dao import BudgetDAO
+from models.budget_cycle import BudgetCycle
 from datetime import datetime
 
 class BudgetService:
