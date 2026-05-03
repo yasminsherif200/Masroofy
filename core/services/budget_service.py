@@ -24,14 +24,17 @@ class BudgetService:
             return 0
         return amount / days
     
-    def createNewCycle(self, amount, start, end):
+    def createNewCycle(self, userID, amount, start, end):
         if not self.validateAmount(amount):
             return False
         if not self.validateDate(start, end):
             return False
         days = (end - start).days
         daily_limit = self.calculateDailyLimit(amount, days)
+        from core.models import User
+        user = User.objects.get(userID=userID)
         cycle = BudgetCycle(
+            user=user,
             totalAllowance= amount,
             dailyLimit=     daily_limit,
             startDate=      start,

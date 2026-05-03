@@ -54,12 +54,17 @@ def setup(request):
         start = date.fromisoformat(start_date)
         end = date.fromisoformat(end_date)
 
-        budget_service.createNewCycle(
-            float(amount), start, end
-        )
+        budget_service.createNewCycle(user_id, float(amount), start, end)
 
-        return redirect('dashboard')
-    
+        success = budget_service.createNewCycle(user_id, float(amount), start, end)
+
+        if success:
+            return redirect('dashboard')
+        else:
+            return render(request, 'core/setup.html', {
+                'error': 'Invalid amount or dates.'
+            })
+        
     return render(request, 'core/setup.html')
 
 

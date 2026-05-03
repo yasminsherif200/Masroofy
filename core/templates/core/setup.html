@@ -4,12 +4,16 @@
 <div class="card">
     <h2>Setup Budget</h2>
 
+    {% if error %}
+        <p style="color:red;">{{ error }}</p>
+    {% endif %}
+
     <form method="POST">
         {% csrf_token %}
-        <input placeholder="Total Budget">
-        <input placeholder="Start Date">
-        <input placeholder="End Date">
-        <button class="btn">Start</button>
+        <input type="number" name="totalAllowance" placeholder="Total Budget (EGP)" min="1" required>
+        <input type="date" name="startDate" required>
+        <input type="date" name="endDate" required>
+        <button type="submit" class="btn">Start</button>
     </form>
 </div>
 {% endblock %}
