@@ -1,9 +1,25 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+# from django.contrib.auth.decorators import login_required
 from core.services import BudgetService
 from core.dao import BudgetDAO
 
-@login_required # Ensure that only authenticated users can access the home view.
+# @login_required # Ensure that only authenticated users can access the home view.
+
+budget_service = BudgetService()
+budget_dao = BudgetDAO()
+
+def dashboard(request):
+    if not request.session.get('user_id'):
+        return redirect('login')
+    user_id = request.session.get('user_id')
+
+    active_cycle = budget_dao.getActiveCycle(user_id)
+    if not active_cycle:
+        return redirect('setup')
+    
+    daily_limit = budget_service.getSafeDailyLimit(active_cycle.cycleID)
+
+
 def home_view(request):
     
     active_cycle = BudgetDAO.getActiveCycle(request.user.id)
