@@ -1,16 +1,22 @@
 {% extends 'core/base.html' %}
-
 {% block content %}
-
 <div class="card" style="max-width: 400px;">
     <h2>Settings</h2>
 
+    {% if error %}
+        <p style="color:red;">{{ error }}</p>
+    {% endif %}
+    {% if success %}
+        <p style="color:green;">{{ success }}</p>
+    {% endif %}
+
     <form method="POST">
         {% csrf_token %}
-        <input placeholder="Change Username">
-        <button class="btn">Save</button>
+        <input type="text" name="userName" placeholder="Username"
+               value="{{ user.userName }}" required>
+        <input type="password" name="pin" placeholder="New PIN (leave blank to keep current)">
+        <input type="password" name="confirmPin" placeholder="Confirm New PIN">
+        <button type="submit" class="btn">Save</button>
     </form>
-
 </div>
-
 {% endblock %}
