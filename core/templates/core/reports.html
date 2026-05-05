@@ -1,226 +1,61 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="light">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Masroofy - Reports</title>
-  
-  <link rel="stylesheet" href="CSS/reset.css">
-  <link rel="stylesheet" href="CSS/variables.css">
-  <link rel="stylesheet" href="CSS/layout.css">
-  <link rel="stylesheet" href="CSS/components.css">
-  <link rel="stylesheet" href="CSS/pages.css">
-  <link rel="stylesheet" href="CSS/main.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
-  <style>
-    .reports-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: var(--space-6);
-    }
-    @media (min-width: 992px) {
-      .reports-grid { grid-template-columns: 1fr 1fr; }
-      .chart-full-width { grid-column: 1 / -1; }
-    }
-    .chart-card {
-      background: var(--color-surface);
-      padding: var(--space-6);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-sm);
-    }
-    .chart-card h3 {
-      font-family: var(--font-display);
-      font-size: var(--text-xl);
-      color: var(--color-text);
-      margin-bottom: var(--space-4);
-    }
-    .reports-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: var(--space-6);
-      flex-wrap: wrap;
-      gap: var(--space-3);
-    }
-    .period-select {
-      padding: var(--space-2) var(--space-4);
-      border-radius: var(--radius-full);
-      border: 2px solid var(--color-border);
-      background: var(--color-surface);
-      font-weight: var(--weight-bold);
-      color: var(--color-text);
-      cursor: pointer;
-    }
-    .summary-stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: var(--space-4);
-      margin-bottom: var(--space-6);
-    }
-    .summary-stat {
-      background: var(--color-surface);
-      padding: var(--space-4) var(--space-5);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-sm);
-      text-align: center;
-    }
-    .summary-stat .label { font-size: var(--text-xs); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-    .summary-stat .value { font-size: var(--text-2xl); font-weight: var(--weight-bold); font-family: var(--font-display); margin-top: var(--space-1); }
-    .summary-stat.income .value { color: var(--color-success); }
-    .summary-stat.expense .value { color: var(--color-danger); }
-    .summary-stat.savings .value { color: var(--color-blue); }
-    @media (max-width: 600px) { .summary-stats { grid-template-columns: 1fr; } }
-  </style>
-</head>
-<body>
-  <!-- Global Navbar -->
-  <nav style="position: absolute; top: 0; left: 0; width: 100%; height: 64px; padding: 0 var(--space-8); display: flex; justify-content: space-between; align-items: center; background: var(--color-surface); backdrop-filter: blur(8px); border-bottom: 1px solid var(--color-border); z-index: 1000;">
-    <div style="font-family: var(--font-display); font-size: var(--text-xl); font-weight: var(--weight-bold); color: var(--color-text);">💸 Masroofy</div>
-    <div style="display: flex; gap: var(--space-4); align-items: center; flex-wrap: wrap; justify-content: flex-end;">
-      <a href="dashboard.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Dashboard</a>
-      <a href="add_expense.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Add Expense</a>
-      <a href="history.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">History</a>
-      <a href="reports.html" style="color: var(--color-primary); text-decoration: none; font-weight: var(--weight-bold); font-size: var(--text-sm);">Reports</a>
-      <a href="settings.html" style="color: var(--color-text); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Settings</a>
-      <div style="width: 1px; height: 16px; background: var(--color-border); margin: 0 var(--space-2);"></div>
-      <a href="#" id="navLogout" style="color: var(--color-danger); text-decoration: none; font-weight: var(--weight-medium); font-size: var(--text-sm);">Logout</a>
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2>Reports</h2>
+
+    <div class="grid">
+        <div class="card">
+            <h3>Total Budget</h3>
+            <p>{{ cycle.totalAllowance }} {{ currency }}</p>
+        </div>
+        <div class="card">
+            <h3>Total Spent</h3>
+            <p>{{ total_spent }} {{ currency }}</p>
+        </div>
+        <div class="card">
+            <h3>Remaining Balance</h3>
+            <p>{{ balance }} {{ currency }}</p>
+        </div>
     </div>
-  </nav>
 
-  <div class="app-container" style="padding-top: 64px; height: calc(100vh - 64px);">
-    <aside id="appSidebar" class="sidebar"></aside>
+    {% if category_data %}
+        <h3 style="margin-top:20px;">Spending by Category</h3>
+        <table style="width:100%; border-collapse:collapse;">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category, percentage in category_data.items %}
+                <tr>
+                    <td>{{ category }}</td>
+                    <td>{{ percentage }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
-    <main class="main-content">
-      <header id="appTopbar" class="topbar"></header>
-
-      <div class="page-content">
-
-        <div class="reports-header">
-          <h2 style="font-family:var(--font-display);color:var(--color-text);"></h2>
-          <select id="periodSelect" class="period-select">
-            <option value="7">Last 7 Days</option>
-            <option value="month" selected>This Month</option>
-            <option value="lastmonth">Last Month</option>
-            <option value="year">This Year</option>
-          </select>
+        <h3 style="margin-top:32px;">Spending Chart</h3>
+        <div style="max-width:400px; margin: 0 auto;">
+            <canvas id="categoryChart"
+                data-labels="{{ category_data.keys|join:',' }}"
+                data-values="{{ category_data.values|join:',' }}">
+            </canvas>
         </div>
 
-        <div class="summary-stats">
-          <div class="summary-stat income">
-            <div class="label">Total Income</div>
-            <div class="value" id="totalIncome">$0.00</div>
-          </div>
-          <div class="summary-stat expense">
-            <div class="label">Total Spent</div>
-            <div class="value" id="totalSpent">$0.00</div>
-          </div>
-          <div class="summary-stat savings">
-            <div class="label">Savings Rate</div>
-            <div class="value" id="savingsRate">0%</div>
-          </div>
-        </div>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        {% load static %}
+        <script src="{% static 'core/js/charts.js' %}"></script>
 
-        <div class="reports-grid">
-          <div class="chart-card chart-full-width">
-            <h3>Income vs Expenses (12 months)</h3>
-            <canvas id="incomeExpenseChart" height="100"></canvas>
-          </div>
-          <div class="chart-card">
-            <h3>Spending by Category</h3>
-            <canvas id="categoryDonutChart"></canvas>
-          </div>
-          <div class="chart-card">
-            <h3>Daily Spending</h3>
-            <canvas id="dailyBarChart"></canvas>
-          </div>
-        </div>
+    {% else %}
+        <p>No spending data yet.</p>
+    {% endif %}
 
-      </div>
-    </main>
-  </div>
-
-  <script type="module">
-    import { AppContainer } from './JS/core.js';
-    import { SidebarComponent, TopbarComponent, ChartFactory } from './JS/ui.js';
-    import './JS/services.js';
-    
-    AppContainer.get('authService').requireAuth();
-    
-    new SidebarComponent('#appSidebar', AppContainer.get('authService'), 'reports').mount();
-    new TopbarComponent('#appTopbar', { title: 'Reports', subtitle: 'Analyze your spending habits' }).mount();
-
-    document.getElementById('navLogout').addEventListener('click', (e) => {
-      e.preventDefault();
-      AppContainer.get('authService').logout();
-    });
-
-    const reportService  = AppContainer.get('reportService');
-    const expenseService = AppContainer.get('expenseService');
-    const formatter      = AppContainer.get('formatter');
-    const now = new Date();
-
-    let lineChart = null, donutChart = null, barChart = null;
-
-    function destroyCharts() {
-      [lineChart, donutChart, barChart].forEach(c => { try { c?.destroy(); } catch(e) {} });
-    }
-
-    function renderCharts(period) {
-      destroyCharts();
-
-      let year = now.getFullYear(), month = now.getMonth() + 1;
-      if (period === 'lastmonth') {
-        const d = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-        year = d.getFullYear(); month = d.getMonth() + 1;
-      }
-
-      const monthlyData = reportService.monthly(year, month);
-      const yearlyData  = reportService.yearlyTrend();
-      const rate        = reportService.savingsRate(year, month);
-
-      document.getElementById('totalIncome').textContent  = formatter.money(monthlyData.totals.income);
-      document.getElementById('totalSpent').textContent   = formatter.money(monthlyData.totals.expenses);
-      document.getElementById('savingsRate').textContent  = rate + '%';
-
-      // Income vs Expenses line chart (always 12-month trend)
-      const ieCanvas = document.getElementById('incomeExpenseChart');
-      if (yearlyData.labels.length > 0) {
-        lineChart = ChartFactory.line(ieCanvas, {
-          labels: yearlyData.labels,
-          datasets: [
-            { label: 'Income',   data: yearlyData.income,   borderColor: '#2ECC71', backgroundColor: 'rgba(46,204,113,0.1)' },
-            { label: 'Expenses', data: yearlyData.expenses, borderColor: '#FF6F61', backgroundColor: 'rgba(255,111,97,0.1)' }
-          ]
-        });
-      }
-
-      // Category donut
-      const categories = Array.from(monthlyData.byCategory.keys());
-      const amounts    = Array.from(monthlyData.byCategory.values()).map(v => v.total);
-      const donutCanvas = document.getElementById('categoryDonutChart');
-      if (categories.length > 0) {
-        donutChart = ChartFactory.donut(donutCanvas, {
-          labels: categories.map(c => c.charAt(0).toUpperCase() + c.slice(1)),
-          data:   amounts
-        });
-      }
-
-      // Daily bar chart
-      const barCanvas = document.getElementById('dailyBarChart');
-      if (monthlyData.byDay.labels.length > 0) {
-        barChart = ChartFactory.bar(barCanvas, {
-          labels:   monthlyData.byDay.labels,
-          datasets: [{ label: 'Spent', data: monthlyData.byDay.amounts }]
-        });
-      }
-    }
-
-    setTimeout(() => renderCharts('month'), 100);
-
-    document.getElementById('periodSelect').addEventListener('change', (e) => {
-      setTimeout(() => renderCharts(e.target.value), 50);
-    });
-  </script>
-</body>
-</html>
+    <div style="text-align:right; margin-top:24px;">
+        <button onclick="window.print()" class="btn">🖨️ Print Report</button>
+    </div>
+</div>
+{% endblock %}
