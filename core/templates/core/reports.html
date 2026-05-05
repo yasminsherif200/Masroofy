@@ -7,15 +7,15 @@
     <div class="grid">
         <div class="card">
             <h3>Total Budget</h3>
-            <p>{{ cycle.totalAllowance }} EGP</p>
+            <p>{{ cycle.totalAllowance }} {{ currency }}</p>
         </div>
         <div class="card">
             <h3>Total Spent</h3>
-            <p>{{ total_spent }} EGP</p>
+            <p>{{ total_spent }} {{ currency }}</p>
         </div>
         <div class="card">
             <h3>Remaining Balance</h3>
-            <p>{{ balance }} EGP</p>
+            <p>{{ balance }} {{ currency }}</p>
         </div>
     </div>
 
@@ -40,24 +40,22 @@
 
         <h3 style="margin-top:32px;">Spending Chart</h3>
         <div style="max-width:400px; margin: 0 auto;">
-            <canvas id="categoryChart"></canvas>
+            <canvas id="categoryChart"
+                data-labels="{{ category_data.keys|join:',' }}"
+                data-values="{{ category_data.values|join:',' }}">
+            </canvas>
         </div>
 
-        <script>
-            const labels = [{% for category in category_data.keys %}"{{ category }}",{% endfor %}];
-            const values = [{% for percentage in category_data.values %}{{ percentage }},{% endfor %}];
-        </script>
-        {% load static %}
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        {% load static %}
         <script src="{% static 'core/js/charts.js' %}"></script>
 
     {% else %}
         <p>No spending data yet.</p>
     {% endif %}
-</div>
 
-<div style="text-align:right; margin-top:24px;">
-    <button onclick="window.print()" class="btn">🖨️ Print Report</button>
+    <div style="text-align:right; margin-top:24px;">
+        <button onclick="window.print()" class="btn">🖨️ Print Report</button>
+    </div>
 </div>
-
 {% endblock %}

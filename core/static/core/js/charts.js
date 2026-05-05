@@ -1,4 +1,8 @@
-const ctx = document.getElementById('categoryChart').getContext('2d');
+const canvas = document.getElementById('categoryChart');
+const labels = canvas.dataset.labels.split(',').map(l => l.trim());
+const values = canvas.dataset.values.split(',').map(v => parseFloat(v));
+
+const ctx = canvas.getContext('2d');
 
 new Chart(ctx, {
     type: 'pie',
