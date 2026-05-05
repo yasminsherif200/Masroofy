@@ -1,5 +1,5 @@
 from core.dao import TransactionDAO, BudgetDAO
-from core.models import Transaction
+from core.models import Transaction, BudgetCycle
 from core.services import BudgetService
 from decimal import Decimal
 
@@ -27,6 +27,15 @@ class TransactionService:
 
         if not date:
             return {'success': False, 'error': 'Date is required.'}
+        
+        # --- Check balance ---
+        total_spent = self.transactionDAO.getTotalExpensesByCycle(budget_cycle)
+        balance = Decimal(str(budget_cycle.totalAllowance)) - total_spent
+        if amount > balance:
+            return {
+                'success': False,
+                'error': f'Amount exceeds remaining balance of {round(balance, 2)} EGP.'
+            }
 
         # --- Save to DB ---
         transaction = self.transactionDAO.insertTransaction(
@@ -40,7 +49,9 @@ class TransactionService:
         )
 
         # --- 80% Threshold Check (US#6) ---
-        threshold_alert = self.budgetService.checkThreshold(budget_cycle.cycleID)
+        total_spent_after = self.transactionDAO.getTotalExpensesByCycle(budget_cycle)
+        total_allowance = Decimal(str(budget_cycle.totalAllowance))
+        threshold_alert = (total_spent_after / total_allowance) >= Decimal('0.80')
 
         return {
             'success': True,

@@ -11,7 +11,7 @@
     <form method="POST">
         {% csrf_token %}
         <input type="number" name="totalAllowance" placeholder="Total Budget (EGP)" min="1" required>
-        <input type="date" name="startDate" required>
+        <!-- <input type="date" name="startDate" required> -->
         <input type="date" name="endDate" required>
         <button type="submit" class="btn">Start</button>
     </form>

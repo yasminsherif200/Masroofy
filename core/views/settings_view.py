@@ -46,3 +46,21 @@ def settings(request):
     return render(request, 'core/settings.html', {
         'user': user,
     })
+
+def reset_cycle(request):
+    if not request.session.get('user_id'):
+        return redirect('login')
+    user_id = request.session.get('user_id')
+
+    from core.services import BudgetService
+    from core.dao import BudgetDAO, TransactionDAO
+    budget_service = BudgetService()
+    budget_dao = BudgetDAO()
+    transaction_dao = TransactionDAO()
+
+    active_cycle = budget_dao.getActiveCycle(user_id)
+    if active_cycle:
+        transaction_dao.deleteAllTransactionsByCycle(active_cycle)
+        budget_service.resetCurrentCycle(active_cycle.cycleID)
+
+    return redirect('setup')

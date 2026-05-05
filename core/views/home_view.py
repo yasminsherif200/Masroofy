@@ -41,16 +41,15 @@ def setup(request):
     
     if request.method == 'POST':
         amount = request.POST.get('totalAllowance')
-        start_date = request.POST.get('startDate')
         end_date = request.POST.get('endDate')
 
-        if not amount or not start_date or not end_date:
+        if not amount or not end_date:
             return render(request, 'core/setup.html', {
                 'error': 'All fields are required.'
             })
         
         from datetime import date
-        start = date.fromisoformat(start_date)
+        start = date.today()
         end = date.fromisoformat(end_date)
 
         budget_service.createNewCycle(user_id, float(amount), start, end)

@@ -12,4 +12,5 @@ urlpatterns = [
     path('dashboard/', home_view.dashboard, name='dashboard'),
     path('settings/', settings_view.settings , name='settings'),
     path('add-expense/', add_expense_view.add_expense, name='add_expense'),
+    path('reset-cycle/', settings_view.reset_cycle, name='reset_cycle'),
 ]

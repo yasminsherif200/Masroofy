@@ -69,7 +69,7 @@ class BudgetService:
         from core.models import Transaction
         from django.db.models import Sum
         results = Transaction.objects.filter(
-            cycle_id=cycleID
+            budget_cycle_id=cycleID
         ).values('category').annotate(
             total=Sum('amount')
         )

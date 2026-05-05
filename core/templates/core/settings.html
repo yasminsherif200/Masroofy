@@ -18,5 +18,10 @@
         <input type="password" name="confirmPin" placeholder="Confirm New PIN">
         <button type="submit" class="btn">Save</button>
     </form>
+
+    <form method="POST" action="{% url 'reset_cycle' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn" style="background:red;">Reset Budget Cycle</button>
+    </form>
 </div>
 {% endblock %}
