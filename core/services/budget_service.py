@@ -2,7 +2,7 @@ from core.dao import BudgetDAO
 from core.dao import TransactionDAO
 from core.models import BudgetCycle
 from datetime import datetime
-
+from decimal import Decimal
 
 class BudgetService:
 
@@ -63,7 +63,7 @@ class BudgetService:
         if not cycle:
             return 0
         total_spent = self.transactionDAO.getTotalExpensesByCycle(cycleID)
-        return cycle.totalAllowance - total_spent
+        return Decimal(str(cycle.totalAllowance)) - total_spent
 
     def calculateCategoryPercentages(self, cycleID):
         from core.models import Transaction
@@ -92,6 +92,9 @@ class BudgetService:
         if not cycle:
             return False
         total_spent = self.transactionDAO.getTotalExpensesByCycle(cycle)
-        percentage = (total_spent / cycle.totalAllowance) * 100
+        total_allowance = Decimal(str(cycle.totalAllowance))
+        if total_allowance == 0:
+            return False
+        percentage = (total_spent / total_allowance) * 100
         return percentage >= 80
 
