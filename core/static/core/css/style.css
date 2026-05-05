@@ -378,6 +378,65 @@ tbody tr:last-child td {
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+@media print {
+    body {
+        background: white !important;
+        color: black !important;
+    }
+
+    .navbar {
+        display: none !important;
+    }
+
+    .btn {
+        display: none !important;
+    }
+
+    .container {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+    }
+
+    .card {
+        background: white !important;
+        border: 1px solid #ccc !important;
+        box-shadow: none !important;
+        color: black !important;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+    }
+
+    .grid {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 12px !important;
+    }
+
+    .grid .card p {
+        color: #a8832e !important;
+    }
+
+    h2, h3, p, td, th {
+        color: black !important;
+    }
+
+    table {
+        border: 1px solid #ccc !important;
+        break-inside: avoid !important;
+    }
+
+    th, td {
+        border: 1px solid #ccc !important;
+        color: black !important;
+    }
+
+    canvas {
+        max-width: 400px !important;
+    }
+}
+
  
 /* ─── Responsive ────────────────────────────────────── */
 @media (max-width: 768px) {
