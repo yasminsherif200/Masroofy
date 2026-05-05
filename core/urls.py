@@ -16,5 +16,7 @@ urlpatterns = [
     path('add-expense/', add_expense_view.add_expense, name='add_expense'),
     path('reset-cycle/', settings_view.reset_cycle, name='reset_cycle'),
     path('history/', history_view.history, name='history'),
+    path('delete-transaction/<int:transaction_id>/', history_view.delete_transaction, name='delete_transaction'),
+    path('edit-transaction/<int:transaction_id>/', history_view.edit_transaction, name='edit_transaction'),
     path('reports/', reports_view.reports, name='reports'),
 ]

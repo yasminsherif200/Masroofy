@@ -1,0 +1,16 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="card" style="max-width:500px;">
+    <h2>Edit Transaction</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="title" value="{{ transaction.title }}" required>
+        <input type="number" name="amount" value="{{ transaction.amount }}" min="0.01" step="0.01" required>
+        <input type="text" name="category" value="{{ transaction.category }}">
+        <input type="text" name="description" value="{{ transaction.description }}">
+        <button type="submit" class="btn">Save Changes</button>
+    </form>
+</div>
+{% endblock %}

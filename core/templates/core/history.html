@@ -8,21 +8,33 @@
         <table style="width:100%; border-collapse:collapse;">
             <thead>
                 <tr>
-                    <th style="text-align:left; padding:8px; border-bottom:1px solid #ccc;">Title</th>
-                    <th style="text-align:left; padding:8px; border-bottom:1px solid #ccc;">Amount</th>
-                    <th style="text-align:left; padding:8px; border-bottom:1px solid #ccc;">Category</th>
-                    <th style="text-align:left; padding:8px; border-bottom:1px solid #ccc;">Date</th>
-                    <th style="text-align:left; padding:8px; border-bottom:1px solid #ccc;">Description</th>
+                    <th>Title</th>
+                    <th>Amount</th>
+                    <th>Category</th>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for t in transactions %}
                 <tr>
-                    <td style="padding:8px;">{{ t.title }}</td>
-                    <td style="padding:8px;">{{ t.amount }} EGP</td>
-                    <td style="padding:8px;">{{ t.category }}</td>
-                    <td style="padding:8px;">{{ t.date }}</td>
-                    <td style="padding:8px;">{{ t.description }}</td>
+                    <td>{{ t.title }}</td>
+                    <td>{{ t.amount }} EGP</td>
+                    <td>{{ t.category }}</td>
+                    <td>{{ t.date }}</td>
+                    <td>{{ t.description }}</td>
+                    <td>
+                        {% load tz %}
+                        {% now "Y-m-d" as today %}
+                        {% if t.date|date:"Y-m-d" == today %}
+                            <a href="{% url 'edit_transaction' t.id %}" class="btn" style="padding:6px 12px; font-size:0.8rem;">Edit</a>
+                            <form method="POST" action="{% url 'delete_transaction' t.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn" style="padding:6px 12px; font-size:0.8rem; background:linear-gradient(135deg,#c0392b,#922b21);">Delete</button>
+                            </form>
+                        {% endif %}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
