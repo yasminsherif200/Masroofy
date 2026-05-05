@@ -1,11 +1,44 @@
 {% extends 'core/base.html' %}
 
 {% block content %}
-
-<h2>Reports</h2>
-
 <div class="card">
-    <p>Charts will appear here</p>
-</div>
+    <h2>Reports</h2>
 
+    <div class="grid">
+        <div class="card">
+            <h3>Total Budget</h3>
+            <p>{{ cycle.totalAllowance }} EGP</p>
+        </div>
+        <div class="card">
+            <h3>Total Spent</h3>
+            <p>{{ total_spent }} EGP</p>
+        </div>
+        <div class="card">
+            <h3>Remaining Balance</h3>
+            <p>{{ balance }} EGP</p>
+        </div>
+    </div>
+
+    {% if category_data %}
+        <h3 style="margin-top:20px;">Spending by Category</h3>
+        <table style="width:100%; border-collapse:collapse;">
+            <thead>
+                <tr>
+                    <th style="text-align:left; padding:8px; border-bottom:1px solid #ccc;">Category</th>
+                    <th style="text-align:left; padding:8px; border-bottom:1px solid #ccc;">Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category, percentage in category_data.items %}
+                <tr>
+                    <td style="padding:8px;">{{ category }}</td>
+                    <td style="padding:8px;">{{ percentage }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No spending data yet.</p>
+    {% endif %}
+</div>
 {% endblock %}

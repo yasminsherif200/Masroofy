@@ -1,23 +1,34 @@
 {% extends 'core/base.html' %}
 
 {% block content %}
-
-<h2>History</h2>
-
 <div class="card">
-    <table>
-        <tr>
-            <th>Amount</th>
-            <th>Category</th>
-            <th>Date</th>
-        </tr>
+    <h2>Transaction History</h2>
 
-        <tr>
-            <td>100</td>
-            <td>Food</td>
-            <td>2026-05-01</td>
-        </tr>
-    </table>
+    {% if transactions %}
+        <table style="width:100%; border-collapse:collapse;">
+            <thead>
+                <tr>
+                    <th style="text-align:left; padding:8px; border-bottom:1px solid #ccc;">Title</th>
+                    <th style="text-align:left; padding:8px; border-bottom:1px solid #ccc;">Amount</th>
+                    <th style="text-align:left; padding:8px; border-bottom:1px solid #ccc;">Category</th>
+                    <th style="text-align:left; padding:8px; border-bottom:1px solid #ccc;">Date</th>
+                    <th style="text-align:left; padding:8px; border-bottom:1px solid #ccc;">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in transactions %}
+                <tr>
+                    <td style="padding:8px;">{{ t.title }}</td>
+                    <td style="padding:8px;">{{ t.amount }} EGP</td>
+                    <td style="padding:8px;">{{ t.category }}</td>
+                    <td style="padding:8px;">{{ t.date }}</td>
+                    <td style="padding:8px;">{{ t.description }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No transactions yet.</p>
+    {% endif %}
 </div>
-
 {% endblock %}
