@@ -24,7 +24,7 @@ class TransactionDAO:
 
     def getTransactionsByCycle(self, budget_cycle):
         # """Return all transactions for a specific budget cycle."""
-        return Transaction.objects.filter(budget_cycle=budget_cycle)
+        return Transaction.objects.filter(budget_cycle=budget_cycle).order_by('-date', '-created_at')
 
     def getTransactionByID(self, transaction_id):
         # """Return a single transaction by ID, or None if not found."""

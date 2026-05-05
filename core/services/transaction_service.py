@@ -1,5 +1,6 @@
-from core.dao import TransactionDAO
-from core.dao import BudgetDAO
+from core.dao import TransactionDAO, BudgetDAO
+from core.models import Transaction
+from core.services import BudgetService
 from decimal import Decimal
 
 THRESHOLD_PERCENTAGE = Decimal('0.80')  # 80% alert threshold
@@ -10,6 +11,7 @@ class TransactionService:
     def __init__(self):
         self.transactionDAO = TransactionDAO()
         self.budgetDAO = BudgetDAO()
+        self.budgetService = BudgetService()
 
     def addExpense(self, budget_cycle, title, amount, category, date, description=''):
         # Validate and save a new expense transaction.
@@ -38,7 +40,7 @@ class TransactionService:
         )
 
         # --- 80% Threshold Check (US#6) ---
-        threshold_alert = self.checkThreshold(budget_cycle)
+        threshold_alert = self.budgetService.checkThreshold(budget_cycle.cycleID)
 
         return {
             'success': True,
@@ -56,9 +58,7 @@ class TransactionService:
         
     # Update Limit after any new transaction
     def calculateUpdatedDailyLimit(self, budget_cycle):
-        from core.dao import BudgetDAO
-        budget_dao = BudgetDAO()
-        cycle = budget_dao.getCycleByCycleID(budget_cycle.cycleID)
+        cycle = self.budgetDAO.getCycleByCycleID(budget_cycle)
         if not cycle:
             return 0
         total_expenses = self.transactionDAO.getTotalExpensesByCycle(budget_cycle)
