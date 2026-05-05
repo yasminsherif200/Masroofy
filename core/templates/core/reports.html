@@ -24,19 +24,33 @@
         <table style="width:100%; border-collapse:collapse;">
             <thead>
                 <tr>
-                    <th style="text-align:left; padding:8px; border-bottom:1px solid #ccc;">Category</th>
-                    <th style="text-align:left; padding:8px; border-bottom:1px solid #ccc;">Percentage</th>
+                    <th>Category</th>
+                    <th>Percentage</th>
                 </tr>
             </thead>
             <tbody>
                 {% for category, percentage in category_data.items %}
                 <tr>
-                    <td style="padding:8px;">{{ category }}</td>
-                    <td style="padding:8px;">{{ percentage }}%</td>
+                    <td>{{ category }}</td>
+                    <td>{{ percentage }}%</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+
+        <h3 style="margin-top:32px;">Spending Chart</h3>
+        <div style="max-width:400px; margin: 0 auto;">
+            <canvas id="categoryChart"></canvas>
+        </div>
+
+        <script>
+            const labels = [{% for category in category_data.keys %}"{{ category }}",{% endfor %}];
+            const values = [{% for percentage in category_data.values %}{{ percentage }},{% endfor %}];
+        </script>
+        {% load static %}
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="{% static 'core/js/charts.js' %}"></script>
+
     {% else %}
         <p>No spending data yet.</p>
     {% endif %}
