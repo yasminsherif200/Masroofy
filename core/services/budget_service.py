@@ -90,8 +90,7 @@ class BudgetService:
         cycle = self.budgetDAO.getCycleByCycleID(cycleID)
         if not cycle:
             return False
-        total_spent = self.transactionDAO.getTotalExpensesByCycle(
-                          cycleID)
+        total_spent = self.transactionDAO.getTotalExpensesByCycle(cycle)
         percentage = (total_spent / cycle.totalAllowance) * 100
         return percentage >= 80
 
