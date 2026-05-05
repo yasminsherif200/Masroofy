@@ -3,6 +3,7 @@ from core.dao import TransactionDAO
 from core.models import BudgetCycle
 from datetime import datetime
 
+
 class BudgetService:
 
     def __init__(self):

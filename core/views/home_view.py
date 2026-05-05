@@ -16,17 +16,16 @@ def dashboard(request):
     
 
     daily_limit = budget_service.getSafeDailyLimit(active_cycle.cycleID)
-    # waiting for transaction_dao.py
-    # balance = budget_service.getCurrentBalance(active_cycle.cycleID)
-    # threshold_reached = budget_service.checkThreshold(active_cycle.cycleID)
+    balance = budget_service.getCurrentBalance(active_cycle.cycleID)
+    threshold_reached = budget_service.checkThreshold(active_cycle.cycleID)
     remaining_days = budget_service.getRemainingDays(active_cycle.cycleID)
     category_percentages = budget_service.calculateCategoryPercentages(active_cycle.cycleID)
 
     return render(request, 'core/dashboard.html', {
         'daily_limit': round(daily_limit, 2),
-        # 'balance': round(balance, 2),
+        'balance': round(balance, 2),
         'remaining_days': remaining_days,
-        # 'threshold_reached': threshold_reached,
+        'threshold_reached': threshold_reached,
         'category_data': category_percentages,
         'cycle': active_cycle,
     })

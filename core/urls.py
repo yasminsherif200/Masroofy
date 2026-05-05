@@ -1,6 +1,7 @@
 from core.views import login_view
 from core.views import home_view
 from core.views import settings_view
+from core.views import add_expense_view
 from django.urls import path
 
 urlpatterns = [
@@ -10,4 +11,5 @@ urlpatterns = [
     path('setup/', home_view.setup, name='setup'), 
     path('dashboard/', home_view.dashboard, name='dashboard'),
     path('settings/', settings_view.settings , name='settings'),
+    path('add-expense/', add_expense_view.add_expense, name='add_expense'),
 ]
