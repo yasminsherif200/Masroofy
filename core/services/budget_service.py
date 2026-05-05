@@ -52,13 +52,13 @@ class BudgetService:
         return balance / days
 
     def getRemainingDays(self, cycleID):
-        cycle = self.budgetDAO.getActiveCycle(cycleID)
+        cycle = self.budgetDAO.getCycleByCycleID(cycleID)
         if not cycle:
             return 0
         return cycle.getRemainingDays()
-    
+        
     def getCurrentBalance(self, cycleID):
-        cycle = self.budgetDAO.getActiveCycle(cycleID)
+        cycle = self.budgetDAO.getCycleByCycleID(cycleID)
         if not cycle:
             return 0
         total_spent = self.transactionDAO.getTotalExpensesByCycle(cycleID)
@@ -87,7 +87,7 @@ class BudgetService:
         return True
     
     def checkThreshold(self, cycleID):
-        cycle = self.budgetDAO.getActiveCycle(cycleID)
+        cycle = self.budgetDAO.getCycleByCycleID(cycleID)
         if not cycle:
             return False
         total_spent = self.transactionDAO.getTotalExpensesByCycle(
