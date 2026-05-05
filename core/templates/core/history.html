@@ -4,8 +4,10 @@
 <div class="card">
     <h2>Transaction History</h2>
 
+    <input type="text" id="searchInput" placeholder="Search transactions..." style="margin-bottom:20px; width:100%;">
+
     {% if transactions %}
-        <table style="width:100%; border-collapse:collapse;">
+        <table style="width:100%; border-collapse:collapse;" id="transactionTable">
             <thead>
                 <tr>
                     <th>Title</th>
@@ -16,7 +18,7 @@
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="transactionBody">
                 {% for t in transactions %}
                 <tr>
                     <td>{{ t.title }}</td>
@@ -43,4 +45,15 @@
         <p>No transactions yet.</p>
     {% endif %}
 </div>
+
+<script>
+    document.getElementById('searchInput').addEventListener('input', function() {
+        const search = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#transactionBody tr');
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(search) ? '' : 'none';
+        });
+    });
+</script>
 {% endblock %}
