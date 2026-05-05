@@ -11,11 +11,12 @@
 
         <form method="POST">
             {% csrf_token %}
-            <input name="userName" placeholder="Username">
-            <input name="pin" placeholder="PIN">
-            <input name="confirmPin" placeholder="Confirm PIN">
+            <input name="userName" placeholder="Username" type="text">
+            <input name="pin" placeholder="PIN" type="password">
+            <input name="confirmPin" placeholder="Confirm PIN" type="password">
             <button class="btn">Create Account</button>
         </form>
+        <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
     </div>
 </div>
 {% endblock %}
