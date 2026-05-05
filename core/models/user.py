@@ -12,3 +12,4 @@ class User(models.Model):
         return self.userName
     def __str__(self):
         return (f"User ID: {self.userID},\nUser Name: {self.userName}")
+    

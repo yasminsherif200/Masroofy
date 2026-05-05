@@ -27,4 +27,4 @@ class Transaction(models.Model):
         ordering = ['-date', '-created_at']
 
     def __str__(self):
-        return f"{self.title} - {self.amount} ({self.transaction_type})"
+        return f"{self.title} - {self.amount} ({self.transaction_type})"    
