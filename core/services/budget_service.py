@@ -1,4 +1,5 @@
 from core.dao import BudgetDAO
+from core.dao import TransactionDAO
 from core.models import BudgetCycle
 from datetime import datetime
 
@@ -6,7 +7,7 @@ class BudgetService:
 
     def __init__(self):
         self.budgetDAO = BudgetDAO()
-        # self.transactionDAO = TransactionDAO()
+        self.transactionDAO = TransactionDAO()
 
     # Methods
     def isFirstTime(self, userID):
@@ -56,13 +57,12 @@ class BudgetService:
             return 0
         return cycle.getRemainingDays()
     
-    # Waiting for transaction_dao.py
-    # def getCurrentBalance(self, cycleID):
-    #     cycle = self.budgetDAO.getActiveCycle(cycleID)
-    #     if not cycle:
-    #         return 0
-    #     total_spent = self.transactionDAO.getTotalExpensesByCycle(cycleID)
-    #     return cycle.totalAllowance - total_spent
+    def getCurrentBalance(self, cycleID):
+        cycle = self.budgetDAO.getActiveCycle(cycleID)
+        if not cycle:
+            return 0
+        total_spent = self.transactionDAO.getTotalExpensesByCycle(cycleID)
+        return cycle.totalAllowance - total_spent
 
     def calculateCategoryPercentages(self, cycleID):
         from core.models import Transaction
@@ -86,13 +86,12 @@ class BudgetService:
         self.budgetDAO.deleteCycle(cycleID)
         return True
     
-    # Waiting for transaction_dao.py
-    # def checkThreshold(self, cycleID):
-    #     cycle = self.budgetDAO.getActiveCycle(cycleID)
-    #     if not cycle:
-    #         return False
-    #     total_spent = self.transactionDAO.getTotalExpensesByCycle(
-    #                       cycleID)
-    #     percentage = (total_spent / cycle.totalAllowance) * 100
-    #     return percentage >= 80
+    def checkThreshold(self, cycleID):
+        cycle = self.budgetDAO.getActiveCycle(cycleID)
+        if not cycle:
+            return False
+        total_spent = self.transactionDAO.getTotalExpensesByCycle(
+                          cycleID)
+        percentage = (total_spent / cycle.totalAllowance) * 100
+        return percentage >= 80
 
