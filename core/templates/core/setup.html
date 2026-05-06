@@ -1,19 +1,124 @@
+{#
+  Template : core/setup.html
+  ==========================
+  Renders the initial budget-setup wizard.  Shown to authenticated users who
+  have no active budget cycle (first-time users or users who have just reset
+  their cycle via settings_view.reset_cycle).
+
+  Extends
+  -------
+  core/base.html
+
+  Block
+  -----
+  content
+    A card containing the budget-configuration form.
+
+  Context Variables
+  -----------------
+  error : str | None
+    Passed by home_view.setup on validation failure.
+    Possible values:
+      - "All fields are required."     — totalAllowance or endDate left blank
+      - "Invalid amount or dates."     — BudgetService.createNewCycle rejected the input
+
+  Form
+  ----
+  Method : POST  (to the same URL — handled by home_view.setup)
+  CSRF   : {% csrf_token %} included
+
+  Fields
+  ------
+  totalAllowance (number)
+    The total budget for the new cycle, in EGP.
+    Constraints: min="1", required.
+  endDate (date)
+    The cycle end date, in YYYY-MM-DD format (browser date-picker).
+    The start date is hardcoded to today() in home_view.setup.
+    Required.
+
+  Notes
+  -----
+  - The startDate field is commented out in the template; the start date is
+    derived server-side as date.today().  Un-comment and add the
+    corresponding view logic if manual start-date selection is needed.
+  - The `min="1"` constraint on totalAllowance prevents zero or negative
+    budgets at the browser level, complementing server-side validation.
+#}
 {% extends 'core/base.html' %}
 
 {% block content %}
 <div class="card">
     <h2>Setup Budget</h2>
 
+    {# Display validation errors returned by home_view.setup #}
     {% if error %}
         <p style="color:red;">{{ error }}</p>
     {% endif %}
 
+    {# Budget setup form — POST to the same URL (home_view.setup handles it) #}
     <form method="POST">
         {% csrf_token %}
+        {# Total allowance for the budget cycle; minimum value enforced client-side #}
         <input type="number" name="totalAllowance" placeholder="Total Budget (EGP)" min="1" required>
-        <!-- <input type="date" name="startDate" required> -->
+
+        {# startDate is currently handled server-side (defaults to today).
+           Un-comment this field if the user should be able to set a custom start date:
+           <input type="date" name="startDate" required> #}
+
+        {# Cycle end date — user picks when the budget period expires #}
         <input type="date" name="endDate" required>
         <button type="submit" class="btn">Start</button>
     </form>
 </div>
 {% endblock %}
+{#
+  Template : core/setup.html
+  ==========================
+  Renders the initial budget-setup wizard.  Shown to authenticated users who
+  have no active budget cycle (first-time users or users who have just reset
+  their cycle via settings_view.reset_cycle).
+
+  Extends
+  -------
+  core/base.html
+
+  Block
+  -----
+  content
+    A card containing the budget-configuration form.
+
+  Context Variables
+  -----------------
+  error : str | None
+    Passed by home_view.setup on validation failure.
+    Possible values:
+      - "All fields are required."     — totalAllowance or endDate left blank
+      - "Invalid amount or dates."     — BudgetService.createNewCycle rejected the input
+
+  Form
+  ----
+  Method : POST  (to the same URL — handled by home_view.setup)
+  CSRF   : {% csrf_token %} included
+
+  Fields
+  ------
+  totalAllowance (number)
+    The total budget for the new cycle, in EGP.
+    Constraints: min="1", required.
+  endDate (date)
+    The cycle end date, in YYYY-MM-DD format (browser date-picker).
+    The start date is hardcoded to today() in home_view.setup.
+    Required.
+
+  Notes
+  -----
+  - The startDate field is commented out in the template; the start date is
+    derived server-side as date.today().  Un-comment and add the
+    corresponding view logic if manual start-date selection is needed.
+  - The `min="1"` constraint on totalAllowance prevents zero or negative
+    budgets at the browser level, complementing server-side validation.
+#}
+{% extends 'core/base.html' %}
+
+{% block content %}

@@ -1,3 +1,50 @@
+{#
+  Template : core/signup.html
+  ===========================
+  Renders the new-user registration form.
+
+  Extends
+  -------
+  core/base.html  (navigation bar is hidden because no session exists yet)
+
+  Block
+  -----
+  content
+    A centred auth-container holding a card with the signup form.
+
+  Context Variables
+  -----------------
+  error : str | None
+    Passed by login_view.signup on validation failure.
+    Possible values:
+      - "All fields are required."          — one or more fields left blank
+      - "PINs do not match. Please try again." — pin ≠ confirmPin
+
+  Form
+  ----
+  Method : POST  (to the same URL — handled by login_view.signup)
+  CSRF   : {% csrf_token %} included
+
+  Fields
+  ------
+  userName (text)
+    The display name the user wants to register with.
+  pin (password)
+    The user's chosen 4-digit PIN; masked in the browser.
+  confirmPin (password)
+    Confirmation of the PIN; must match `pin` to pass server-side validation.
+
+  Links
+  -----
+  {% url 'login' %}  — directs existing users back to the login page
+
+  Notes
+  -----
+  - None of the input fields carry a `required` attribute; validation is
+    handled server-side in login_view.signup.
+  - After successful registration the user is automatically logged in and
+    redirected to the setup wizard — no separate login step is needed.
+#}
 {% extends 'core/base.html' %}
 
 {% block content %}
@@ -5,18 +52,65 @@
     <div class="card" style="width: 350px;">
         <h2>Signup</h2>
 
+        {# Display validation errors returned by login_view.signup #}
         {% if error %}
             <p style="color:red;">{{ error }}</p>
         {% endif %}
 
+        {# Registration form — POST to the same URL (login_view.signup handles it) #}
         <form method="POST">
             {% csrf_token %}
-            <input name="userName" placeholder="Username" type="text">
-            <input name="pin" placeholder="PIN" type="password">
+            <input name="userName"   placeholder="Username"    type="text">
+            <input name="pin"        placeholder="PIN"         type="password">
+            {# confirmPin must match pin; validated server-side #}
             <input name="confirmPin" placeholder="Confirm PIN" type="password">
             <button class="btn">Create Account</button>
         </form>
+
+        {# Login prompt for users who already have an account #}
         <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
     </div>
 </div>
 {% endblock %}
+{#
+  Template : core/signup.html
+  ===========================
+  Renders the new-user registration form.
+
+  Extends
+  -------
+  core/base.html  (navigation bar is hidden because no session exists yet)
+
+  Block
+  -----
+  content
+    A centred auth-container holding a card with the signup form.
+
+  Context Variables
+  -----------------
+    error : str | None
+        Passed by login_view.signup on validation failure.
+        Possible values:
+        - "All fields are required."          — one or more fields left blank
+        - "PINs do not match. Please try again." — pin ≠ confirmPin
+    Form
+    ----
+    Method : POST  (to the same URL — handled by login_view.signup)
+    CSRF   : {% csrf_token %} included
+    Fields :
+    - userName (text)
+        The display name the user wants to register with.
+    - pin (password)
+        The user's chosen 4-digit PIN; masked in the browser.
+    - confirmPin (password)
+        Confirmation of the PIN; must match `pin` to pass server-side validation.
+    Links
+    -----
+    {% url 'login' %}  — directs existing users back to the login page
+    Notes
+    -----
+    - None of the input fields carry a `required` attribute; validation is
+      handled server-side in login_view.signup.
+    - After successful registration the user is automatically logged in and
+      redirected to the setup wizard — no separate login step is needed.
+#} 

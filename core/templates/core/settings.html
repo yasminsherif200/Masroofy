@@ -1,27 +1,172 @@
+{#
+  Template : core/settings.html
+  =============================
+  Renders the user-settings page with two independent forms:
+
+  1. **Profile form** — update username and optionally change the PIN.
+  2. **Reset cycle form** — destructively wipe the current budget cycle
+     and redirect the user to the setup wizard.
+
+  Extends
+  -------
+  core/base.html
+
+  Block
+  -----
+  content
+    A single card (max-width 400 px) containing both forms and the
+    feedback banners.
+
+  Context Variables
+  -----------------
+  user : User
+    The current user record fetched by UserDAO.getUserSecurityData().
+    Provides user.userName for pre-populating the username field.
+
+  error : str | None
+    Rendered in red on validation failure.  Possible values from
+    settings_view.settings:
+      - "Username is required."
+      - "PIN must be exactly 4 digits."
+      - "PINs do not match."
+
+  success : str | None
+    Rendered in green after a successful save:
+      - "Settings saved successfully."
+
+  Forms
+  -----
+  Profile form
+    Method : POST  (to current URL — handled by settings_view.settings)
+    CSRF   : {% csrf_token %} included
+    Fields :
+      userName (text, required)
+        Pre-filled with user.userName.  Always required.
+      pin (password, optional)
+        New 4-digit PIN.  Leave blank to keep the current PIN.
+      confirmPin (password, optional)
+        Must match `pin` if a new PIN is being set; validated server-side.
+
+  Reset Cycle form
+    Method : POST  (to {% url 'reset_cycle' %} — handled by settings_view.reset_cycle)
+    CSRF   : {% csrf_token %} included
+    Fields : none — single submit button triggers the reset.
+
+  Notes
+  -----
+  - The two forms are visually grouped inside the same card but are separate
+    HTML <form> elements with different action targets.
+  - The Reset button uses inline style "background:red;" to distinguish it
+    visually as a destructive action.
+  - No client-side confirmation dialog is shown before the reset — consider
+    adding an onclick="return confirm('...')" guard to prevent accidental
+    cycle deletion.
+  - PIN validation (4 digits, match check) is enforced server-side only;
+    no minlength or pattern attributes are set on the input.
+#}
 {% extends 'core/base.html' %}
+
 {% block content %}
 <div class="card" style="max-width: 400px;">
     <h2>Settings</h2>
 
+    {# Validation error banner — shown in red on form submission failure #}
     {% if error %}
         <p style="color:red;">{{ error }}</p>
     {% endif %}
+
+    {# Success confirmation banner — shown in green after a successful save #}
     {% if success %}
         <p style="color:green;">{{ success }}</p>
     {% endif %}
 
+    {# ---- Profile update form ------------------------------------------ #}
+    {# POST to the current URL; settings_view.settings handles validation.   #}
     <form method="POST">
         {% csrf_token %}
-        <input type="text" name="userName" placeholder="Username"
+        {# Username — pre-filled with the stored value; always required #}
+        <input type="text"     name="userName"   placeholder="Username"
                value="{{ user.userName }}" required>
-        <input type="password" name="pin" placeholder="New PIN (leave blank to keep current)">
+        {# New PIN — optional; leave blank to keep the current PIN #}
+        <input type="password" name="pin"        placeholder="New PIN (leave blank to keep current)">
+        {# PIN confirmation — must match `pin` if a new PIN is being set #}
         <input type="password" name="confirmPin" placeholder="Confirm New PIN">
         <button type="submit" class="btn">Save</button>
     </form>
+    {# ------------------------------------------------------------------- #}
 
+    {# ---- Reset budget cycle form -------------------------------------- #}
+    {# Separate form that posts to reset_cycle; destroys all transactions   #}
+    {# and the active cycle, then redirects the user to the setup wizard.   #}
+    {# The red button colour signals this is a destructive action.          #}
     <form method="POST" action="{% url 'reset_cycle' %}">
         {% csrf_token %}
         <button type="submit" class="btn" style="background:red;">Reset Budget Cycle</button>
     </form>
+    {# ------------------------------------------------------------------- #}
 </div>
 {% endblock %}
+{#
+  Template : core/settings.html
+  =============================
+  Renders the user-settings page with two independent forms:
+
+  1. **Profile form** — update username and optionally change the PIN.
+  2. **Reset cycle form** — destructively wipe the current budget cycle
+     and redirect the user to the setup wizard.
+
+  Extends
+  -------
+  core/base.html
+
+  Block
+  -----
+  content
+    A single card (max-width 400 px) containing both forms and the
+    feedback banners.
+
+  Context Variables
+  -----------------
+  user : User
+    The current user record fetched by UserDAO.getUserSecurityData().
+    Provides user.userName for pre-populating the username field.
+
+  error : str | None
+    Rendered in red on validation failure.  Possible values from
+    settings_view.settings:
+      - "Username is required."
+      - "PIN must be exactly 4 digits."
+      - "PINs do not match."
+
+  success : str | None
+    Rendered in green after a successful save:
+      - "Settings saved successfully."
+
+  Forms
+  -----
+  Profile form
+    Method : POST  (to current URL — handled by settings_view.settings)
+    CSRF   : {% csrf_token %} included
+    Fields :
+      userName (text, required)
+        Pre-filled with user.userName.  Always required.
+      pin (password, optional)
+        New 4-digit PIN.  Leave blank to keep the current PIN.
+      confirmPin (password, optional)
+        Must match `pin` if a new PIN is being set; validated server-side.
+    Reset Cycle form
+    Method : POST  (to {% url 'reset_cycle' %} — handled by settings_view.reset_cycle)
+    CSRF   : {% csrf_token %} included
+    Fields : none — single submit button triggers the reset.
+    Notes
+    -----
+    - The two forms are visually grouped inside the same card but are separate
+      HTML <form> elements with different action targets.
+    - The Reset button uses inline style "background:red;" to distinguish it
+      visually as a destructive action.
+    - No client-side confirmation dialog is shown before the reset — consider
+      adding an onclick="return confirm('...')" guard to prevent accidental
+        cycle deletion.
+    - PIN validation (4 digits, match check) is enforced server-side only;
+      no minlength or pattern attributes are set on the input.
+      #}

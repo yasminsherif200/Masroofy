@@ -1,13 +1,60 @@
+{#
+  Template : core/base.html
+  =========================
+  Site-wide base layout that every other template extends via:
+
+      {% extends 'core/base.html' %}
+
+  Structure
+  ---------
+  <head>
+    - Page title: "Masroofy"
+    - Global stylesheet: static/core/css/style.css
+    - Blank favicon (data:,) to suppress 404 requests in the browser console
+
+  <body>
+    Conditional navigation bar (shown only when a user is logged in)
+      Checks request.session.user_id — omits the nav entirely on the
+      login and signup pages so unauthenticated visitors see a clean screen.
+
+    Navigation links (authenticated users only):
+      Dashboard    →  {% url 'dashboard' %}
+      Add Expense  →  {% url 'add_expense' %}
+      History      →  {% url 'history' %}
+      Reports      →  {% url 'reports' %}
+      Settings     →  {% url 'settings' %}
+      Logout       →  {% url 'logout' %}
+
+  Content block
+    {% block content %}{% endblock %}
+      Child templates override this block to inject their own body content
+      inside the shared .container wrapper.
+
+  Template Tags / Filters Used
+  ----------------------------
+  {% load static %}   — enables the {% static %} tag for resolving asset URLs
+
+  Context Variables
+  -----------------
+  request.session.user_id : int | None
+    Set by login_view / signup_view after successful authentication.
+    Used here to conditionally render the navigation bar.
+#}
 {% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>Masroofy</title>
+    {# Global stylesheet — path resolved by the staticfiles app #}
     <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+    {# Blank favicon suppresses the browser's automatic /favicon.ico 404 request #}
     <link rel="icon" href="data:,">
 </head>
 <body>
 
+{# --- Navigation bar ---------------------------------------------------- #}
+{# Only rendered when a user session is active (i.e. after login/signup).   #}
+{# On login.html and signup.html, user_id is absent so the nav is hidden.   #}
 {% if request.session.user_id %}
 <nav class="navbar">
     <div class="logo">Masroofy</div>
@@ -21,7 +68,9 @@
     </ul>
 </nav>
 {% endif %}
+{# ----------------------------------------------------------------------- #}
 
+{# Main content wrapper — child templates inject their HTML here #}
 <div class="container">
     {% block content %}{% endblock %}
 </div>

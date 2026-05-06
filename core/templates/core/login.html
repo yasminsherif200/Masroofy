@@ -1,3 +1,47 @@
+{#
+  Template : core/login.html
+  ==========================
+  Renders the PIN-based login form for returning users.
+
+  Extends
+  -------
+  core/base.html  (navigation bar is hidden because no session exists yet)
+
+  Block
+  -----
+  content
+    A centred auth-container holding a card with the login form.
+
+  Context Variables
+  -----------------
+  error : str | None
+    Passed by login_view.login on failed authentication.
+    Two possible values:
+      - "Incorrect PIN. Please try again."   — wrong PIN
+      - "Too many failed attempts. Try again later."  — account locked
+
+  Form
+  ----
+  Method : POST  (to the same URL — handled by login_view.login)
+  CSRF   : {% csrf_token %} included (required by Django's CSRF middleware)
+
+  Fields
+  ------
+  pin (password)
+    The user's 4-digit PIN; rendered as type="password" so the value
+    is masked in the browser.
+
+  Links
+  -----
+  {% url 'signup' %}  — directs new users to the registration page
+
+  Notes
+  -----
+  - The submit button has no explicit type attribute; browsers default to
+    type="submit", which is the intended behaviour.
+  - No client-side PIN-length validation is applied; server-side validation
+    in UserService.verifyLogin() is the authoritative check.
+#}
 {% extends 'core/base.html' %}
 
 {% block content %}
@@ -5,16 +49,20 @@
     <div class="card" style="width: 350px;">
         <h2>Login</h2>
 
+        {# Display authentication errors returned by login_view.login #}
         {% if error %}
             <p style="color:red;">{{ error }}</p>
         {% endif %}
 
+        {# PIN login form — POST to the same URL (login_view.login handles it) #}
         <form method="POST">
             {% csrf_token %}
+            {# type="password" masks the entered PIN characters #}
             <input type="password" name="pin" placeholder="PIN">
             <button class="btn">Login</button>
         </form>
 
+        {# Registration prompt for users without an account #}
         <p>Don't have account? <a href="{% url 'signup' %}">Signup</a></p>
     </div>
 </div>

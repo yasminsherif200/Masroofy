@@ -1,12 +1,95 @@
+{#
+  Template : core/history.html
+  ============================
+  Displays a searchable, tabular list of all transactions in the user's
+  active budget cycle.  Edit and Delete actions are conditionally shown
+  only for transactions dated today (matching the server-side eligibility
+  rules enforced by TransactionService).
+
+  Extends
+  -------
+  core/base.html
+
+  Block
+  -----
+  content
+    A full-width card containing a live-search input and a transaction
+    table, or a "No transactions yet." fallback message.
+
+  Context Variables
+  -----------------
+  transactions : QuerySet / list of Transaction
+    All transactions for the active cycle, provided by
+    TransactionDAO.getTransactionsByCycle().  Each object exposes:
+      t.title       — short transaction label
+      t.amount      — monetary value (float)
+      t.category    — category string (may be empty)
+      t.date        — date the expense occurred (date object)
+      t.description — optional free-text note
+      t.id          — primary key, used in edit/delete URL reversal
+
+  cycle : BudgetCycle
+    The active cycle instance.  Passed for context but not directly
+    rendered in this template.
+
+  Template Tags / Filters Used
+  ----------------------------
+  {% load tz %}
+    Loads Django's timezone template tags.
+  {% now "Y-m-d" as today %}
+    Captures the current server-side date as a string (e.g. "2025-05-01")
+    into the variable `today`.
+  {{ t.date|date:"Y-m-d" }}
+    Formats the transaction's date field to the same YYYY-MM-DD string for
+    comparison with `today`.
+
+  Edit / Delete Visibility Rule
+  -----------------------------
+  Both action buttons are wrapped in:
+      {% if t.date|date:"Y-m-d" == today %}
+  This means Edit and Delete are only visible for transactions whose date
+  matches today — consistent with the server-side canEditExpense /
+  canRemoveExpense checks in history_view.py.
+
+  Edit Action
+  -----------
+  Links to {% url 'edit_transaction' t.id %} (GET request).
+
+  Delete Action
+  -------------
+  Submits a POST form to {% url 'delete_transaction' t.id %}.
+  Uses an inline <form method="POST"> with {% csrf_token %} so the delete
+  is CSRF-protected and does not rely on JavaScript.
+
+  Client-side Search (JavaScript)
+  --------------------------------
+  A plain-text <input id="searchInput"> filters visible table rows in real
+  time using an 'input' event listener.  For each row the script compares
+  the lowercased full row text against the lowercased search string and
+  toggles row.style.display accordingly.  No external libraries required.
+
+  Notes
+  -----
+  - The table id="transactionTable" and tbody id="transactionBody" are
+    referenced by the JavaScript filter; do not rename them without
+    updating the script.
+  - Monetary amounts are displayed with the "EGP" suffix hardcoded in the
+    template; currency is not yet dynamic.
+  - The empty-state message ("No transactions yet.") is shown via an
+    {% else %} branch of the {% if transactions %} tag.
+#}
 {% extends 'core/base.html' %}
 
 {% block content %}
 <div class="card">
     <h2>Transaction History</h2>
 
-    <input type="text" id="searchInput" placeholder="Search transactions..." style="margin-bottom:20px; width:100%;">
+    {# Live client-side search — filters table rows as the user types #}
+    <input type="text" id="searchInput" placeholder="Search transactions..."
+           style="margin-bottom:20px; width:100%;">
 
     {% if transactions %}
+        {# Transaction table — id attributes referenced by the JS filter below #}
         <table style="width:100%; border-collapse:collapse;" id="transactionTable">
             <thead>
                 <tr>
@@ -15,7 +98,7 @@
                     <th>Category</th>
                     <th>Date</th>
                     <th>Description</th>
-                    <th>Actions</th>
+                    <th>Actions</th>  {# Edit / Delete — only shown for today's transactions #}
                 </tr>
             </thead>
             <tbody id="transactionBody">
@@ -27,13 +110,26 @@
                     <td>{{ t.date }}</td>
                     <td>{{ t.description }}</td>
                     <td>
+                        {# Capture today's date server-side for the edit/delete visibility check #}
                         {% load tz %}
                         {% now "Y-m-d" as today %}
+
+                        {# Show Edit and Delete only for transactions dated today.
+                           Mirrors the canEditExpense / canRemoveExpense rules in history_view.py. #}
                         {% if t.date|date:"Y-m-d" == today %}
-                            <a href="{% url 'edit_transaction' t.id %}" class="btn" style="padding:6px 12px; font-size:0.8rem;">Edit</a>
-                            <form method="POST" action="{% url 'delete_transaction' t.id %}" style="display:inline;">
+                            {# Edit — GET request to the edit form #}
+                            <a href="{% url 'edit_transaction' t.id %}" class="btn"
+                               style="padding:6px 12px; font-size:0.8rem;">Edit</a>
+
+                            {# Delete — POST form so the action is CSRF-protected #}
+                            <form method="POST" action="{% url 'delete_transaction' t.id %}"
+                                  style="display:inline;">
                                 {% csrf_token %}
-                                <button type="submit" class="btn" style="padding:6px 12px; font-size:0.8rem; background:linear-gradient(135deg,#c0392b,#922b21);">Delete</button>
+                                <button type="submit" class="btn"
+                                        style="padding:6px 12px; font-size:0.8rem;
+                                               background:linear-gradient(135deg,#c0392b,#922b21);">
+                                    Delete
+                                </button>
                             </form>
                         {% endif %}
                     </td>
@@ -42,18 +138,25 @@
             </tbody>
         </table>
     {% else %}
+        {# Empty state — no transactions exist for the active cycle yet #}
         <p>No transactions yet.</p>
     {% endif %}
 </div>
 
+{# ---- Client-side search script ---------------------------------------- #}
+{# Filters #transactionBody rows in real time by matching against the full   #}
+{# text content of each row (all columns combined).                          #}
 <script>
     document.getElementById('searchInput').addEventListener('input', function() {
         const search = this.value.toLowerCase();
+        // Iterate over every <tr> in the table body
         const rows = document.querySelectorAll('#transactionBody tr');
         rows.forEach(row => {
             const text = row.innerText.toLowerCase();
+            // Show the row if the search string appears anywhere in its text
             row.style.display = text.includes(search) ? '' : 'none';
         });
     });
 </script>
+{# ----------------------------------------------------------------------- #}
 {% endblock %}
