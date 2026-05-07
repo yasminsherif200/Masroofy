@@ -1,4 +1,5 @@
-{#
+{% extends 'core/base.html' %}
+<!-- {#
   Template : core/history.html
   ============================
   Displays a searchable, tabular list of all transactions in the user's
@@ -46,7 +47,10 @@
   Edit / Delete Visibility Rule
   -----------------------------
   Both action buttons are wrapped in:
-      {% if t.date|date:"Y-m-d" == today %}
+    {% if t.date|date:"Y-m-d" == today %}
+        ...
+    {% endif %}
+     
   This means Edit and Delete are only visible for transactions whose date
   matches today — consistent with the server-side canEditExpense /
   canRemoveExpense checks in history_view.py.
@@ -76,9 +80,19 @@
   - Monetary amounts are displayed with the "EGP" suffix hardcoded in the
     template; currency is not yet dynamic.
   - The empty-state message ("No transactions yet.") is shown via an
-    {% else %} branch of the {% if transactions %} tag.
-#}
-{% extends 'core/base.html' %}
+    {% if transactions %} {% endif %} check; if the QuerySet is empty, the table is
+    not rendered and the message is shown instead.
+    - The category column may be empty if the user did not specify a category
+      for that transaction; this is not considered an empty state for the
+      entire table.
+    - The description column may also be empty; this is allowed and does not
+      trigger the empty state.
+    - The Edit and Delete buttons are styled with inline CSS for simplicity; in a production app these would be extracted to a CSS class.
+    - The search input is styled with inline CSS for simplicity; in a production app this would be extracted to a CSS class.
+
+
+#} -->
+
 
 {% block content %}
 <div class="card">
@@ -114,8 +128,8 @@
                         {% load tz %}
                         {% now "Y-m-d" as today %}
 
-                        {# Show Edit and Delete only for transactions dated today.
-                           Mirrors the canEditExpense / canRemoveExpense rules in history_view.py. #}
+                        <!-- {# Show Edit and Delete only for transactions dated today.
+                           Mirrors the canEditExpense / canRemoveExpense rules in history_view.py. #} -->
                         {% if t.date|date:"Y-m-d" == today %}
                             {# Edit — GET request to the edit form #}
                             <a href="{% url 'edit_transaction' t.id %}" class="btn"

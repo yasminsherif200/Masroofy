@@ -1,9 +1,10 @@
+{% load static %}
 <!-- {#
   Template : core/base.html
   =========================
   Site-wide base layout that every other template extends via:
 
-      {% extends 'core/base.html' %}
+    
 
   Structure
   ---------
@@ -26,13 +27,14 @@
       Logout       →  {% url 'logout' %}
 
   Content block
-    {% block content %}{% endblock %}
+    
       Child templates override this block to inject their own body content
       inside the shared .container wrapper.
 
   Template Tags / Filters Used
   ----------------------------
-  {% load static %}   — enables the {% static %} tag for resolving asset URLs
+
+
 
   Context Variables
   -----------------
@@ -40,40 +42,43 @@
     Set by login_view / signup_view after successful authentication.
     Used here to conditionally render the navigation bar.
 #} -->
-{% load static %}
+
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Masroofy</title>
-    {# Global stylesheet — path resolved by the staticfiles app #}
-    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
-    {# Blank favicon suppresses the browser's automatic /favicon.ico 404 request #}
-    <link rel="icon" href="data:,">
+  <title>Masroofy</title>
+  {# Global stylesheet — path resolved by the staticfiles app #}
+  <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+  {# Blank favicon suppresses the browser's automatic /favicon.ico 404 request #}
+  <link rel="icon" href="data:,">
 </head>
+
 <body>
 
-{# --- Navigation bar ---------------------------------------------------- #}
-{# Only rendered when a user session is active (i.e. after login/signup).   #}
-{# On login.html and signup.html, user_id is absent so the nav is hidden.   #}
-{% if request.session.user_id %}
-<nav class="navbar">
+  {# --- Navigation bar ---------------------------------------------------- #}
+  {# Only rendered when a user session is active (i.e. after login/signup). #}
+  {# On login.html and signup.html, user_id is absent so the nav is hidden. #}
+  {% if request.session.user_id %}
+  <nav class="navbar">
     <div class="logo">Masroofy</div>
     <ul class="nav-links">
-        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-        <li><a href="{% url 'add_expense' %}">Add Expense</a></li>
-        <li><a href="{% url 'history' %}">History</a></li>
-        <li><a href="{% url 'reports' %}">Reports</a></li>
-        <li><a href="{% url 'settings' %}">Settings</a></li>
-        <li><a href="{% url 'logout' %}">Logout</a></li>
+      <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+      <li><a href="{% url 'add_expense' %}">Add Expense</a></li>
+      <li><a href="{% url 'history' %}">History</a></li>
+      <li><a href="{% url 'reports' %}">Reports</a></li>
+      <li><a href="{% url 'settings' %}">Settings</a></li>
+      <li><a href="{% url 'logout' %}">Logout</a></li>
     </ul>
-</nav>
-{% endif %}
-{# ----------------------------------------------------------------------- #}
+  </nav>
+  {% endif %}
+  {# ----------------------------------------------------------------------- #}
 
-{# Main content wrapper — child templates inject their HTML here #}
-<div class="container">
+  {# Main content wrapper — child templates inject their HTML here #}
+  <div class="container">
     {% block content %}{% endblock %}
-</div>
+  </div>
 
 </body>
+
 </html>

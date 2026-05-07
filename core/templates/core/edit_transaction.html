@@ -1,4 +1,5 @@
-{#
+{% extends 'core/base.html' %}
+<!-- {#
   Template : core/edit_transaction.html
   =====================================
   Renders a pre-populated form for editing an existing transaction.
@@ -54,7 +55,7 @@
     validation failures in edit_transaction redirect to 'history' instead.
   - The card's inline max-width style keeps the form compact on wide screens.
 #}
-{% extends 'core/base.html' %}
+
 
 {% block content %}
 <div class="card" style="max-width:500px;">

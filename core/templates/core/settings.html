@@ -1,4 +1,5 @@
-{#
+{% extends 'core/base.html' %}
+<!-- {#
   Template : core/settings.html
   =============================
   Renders the user-settings page with two independent forms:
@@ -64,7 +65,7 @@
   - PIN validation (4 digits, match check) is enforced server-side only;
     no minlength or pattern attributes are set on the input.
 #}
-{% extends 'core/base.html' %}
+
 
 {% block content %}
 <div class="card" style="max-width: 400px;">

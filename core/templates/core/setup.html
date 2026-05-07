@@ -1,3 +1,4 @@
+{% extends 'core/base.html' %}
 {#
   Template : core/setup.html
   ==========================
@@ -45,7 +46,7 @@
   - The `min="1"` constraint on totalAllowance prevents zero or negative
     budgets at the browser level, complementing server-side validation.
 #}
-{% extends 'core/base.html' %}
+
 
 {% block content %}
 <div class="card">
@@ -62,9 +63,9 @@
         {# Total allowance for the budget cycle; minimum value enforced client-side #}
         <input type="number" name="totalAllowance" placeholder="Total Budget (EGP)" min="1" required>
 
-        {# startDate is currently handled server-side (defaults to today).
-           Un-comment this field if the user should be able to set a custom start date:
-           <input type="date" name="startDate" required> #}
+        <!-- {# startDate is currently handled server-side (defaults to today).
+           Un-comment this field if the user should be able to set a custom start date:#} -->
+           <input type="date" name="startDate" required> 
 
         {# Cycle end date — user picks when the budget period expires #}
         <input type="date" name="endDate" required>
@@ -119,6 +120,6 @@
   - The `min="1"` constraint on totalAllowance prevents zero or negative
     budgets at the browser level, complementing server-side validation.
 #}
-{% extends 'core/base.html' %}
 
-{% block content %}
+
+ 

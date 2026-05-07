@@ -1,4 +1,5 @@
-{#
+{% extends 'core/base.html' %}
+<!-- {#
   Template : core/reports.html
   ============================
   Renders the full spending-analytics report for the user's active budget
@@ -61,7 +62,7 @@
   core/js/charts.js (local static)
     Project-specific script that reads the <canvas> data-labels and
     data-values attributes and initialises the Chart.js chart.
-    Loaded via {% static 'core/js/charts.js' %}.
+   
 
   Chart Data Encoding
   -------------------
@@ -73,7 +74,7 @@
 
   Template Tags / Filters Used
   ----------------------------
-  {% load static %}          — enables {% static %} for resolving asset URLs
+  
   {{ category_data.keys }}   — dict_keys view of category names
   {{ category_data.values }} — dict_values view of percentages
   |join:','                  — joins an iterable into a comma-delimited string
@@ -85,10 +86,10 @@
     the category summary.
   - The `currency` variable is missing from the view context; add it to
     reports_view.reports to avoid empty suffixes on monetary values.
-  - chart.js and charts.js are loaded conditionally (inside {% if category_data %})
+  - chart.js and charts.js are loaded conditionally (inside {% if category_data %}) {%endif%}
     to avoid loading unused scripts when there is no spending data.
-#}
-{% extends 'core/base.html' %}
+#} -->
+
 
 {% block content %}
 <div class="card">
