@@ -1,12 +1,107 @@
 {% extends 'core/base.html' %}
+<!-- {#
+  Template : core/reports.html
+  ============================
+  Renders the full spending-analytics report for the user's active budget
+  cycle.  Includes:
+
+  * A 3-card summary grid (total budget, total spent, remaining balance).
+  * A category-breakdown table (category → % of total spending).
+  * A Chart.js chart (data passed via <canvas> data-* attributes and
+    rendered by the static JS file core/js/charts.js).
+  * A print button (window.print()) for hardcopy reports.
+
+  Extends
+  -------
+  core/base.html
+
+  Block
+  -----
+  content
+    A full-width card containing all report sections.
+
+  Context Variables
+  -----------------
+  cycle : BudgetCycle
+    The active cycle instance.
+    Used for:
+      cycle.totalAllowance — total budget for the cycle (summary card)
+
+  total_spent : float
+    Sum of all expenses in the cycle, rounded to 2 d.p.
+    Provided by TransactionDAO.getTotalExpensesByCycle().
+
+  balance : float
+    Remaining unspent budget, rounded to 2 d.p.
+    Provided by BudgetService.getCurrentBalance().
+
+  category_data : dict[str, float] | None
+    Mapping of category name → percentage of total spending.
+    Provided by BudgetService.calculateCategoryPercentages().
+    When None or empty, the table and chart sections are replaced by
+    a "No spending data yet." message.
+
+  transactions : QuerySet / list
+    Full list of transactions for the cycle.  Passed in context by
+    reports_view.reports but not currently rendered in this template
+    (reserved for a future detailed transaction table on the reports page).
+
+  currency : str | None
+    Currency symbol/code to display after monetary values (e.g. "EGP").
+    NOTE: This variable is referenced in the template ({{ currency }}) but
+    is NOT currently included in the context returned by reports_view.reports.
+    All monetary values will render as "<amount> " (with a trailing space)
+    until the view is updated to pass `currency`.
+
+  Static Assets
+  -------------
+  chart.js (CDN)
+    Loaded from https://cdn.jsdelivr.net/npm/chart.js when category_data
+    is non-empty.  Provides the Chart constructor used by charts.js.
+
+  core/js/charts.js (local static)
+    Project-specific script that reads the <canvas> data-labels and
+    data-values attributes and initialises the Chart.js chart.
+   
+
+  Chart Data Encoding
+  -------------------
+  Category labels and percentage values are embedded on the <canvas> element
+  as pipe-delimited data-* attributes using the |join:',' filter:
+      data-labels="{{ category_data.keys|join:',' }}"
+      data-values="{{ category_data.values|join:',' }}"
+  charts.js should split these strings on ',' to reconstruct the arrays.
+
+  Template Tags / Filters Used
+  ----------------------------
+  
+  {{ category_data.keys }}   — dict_keys view of category names
+  {{ category_data.values }} — dict_values view of percentages
+  |join:','                  — joins an iterable into a comma-delimited string
+
+  Notes
+  -----
+  - The `transactions` context variable is available but not yet rendered in
+    a table here.  It can be used to add a per-transaction breakdown below
+    the category summary.
+  - The `currency` variable is missing from the view context; add it to
+    reports_view.reports to avoid empty suffixes on monetary values.
+  - chart.js and charts.js are loaded conditionally (inside {% if category_data %}) {%endif%}
+    to avoid loading unused scripts when there is no spending data.
+#} -->
+
 
 {% block content %}
 <div class="card">
     <h2>Reports</h2>
 
+    {# ---- Summary grid ------------------------------------------------- #}
+    {# Three equal-width cards: total budget, amount spent, remaining balance #}
     <div class="grid">
         <div class="card">
             <h3>Total Budget</h3>
+            {# cycle.totalAllowance — the allowance set during setup #}
+            {# currency — NOTE: currently not passed by reports_view; will render as empty #}
             <p>{{ cycle.totalAllowance }} {{ currency }}</p>
         </div>
         <div class="card">
@@ -18,8 +113,14 @@
             <p>{{ balance }} {{ currency }}</p>
         </div>
     </div>
+    {# ------------------------------------------------------------------- #}
 
+    {# ---- Category breakdown and chart --------------------------------- #}
+    {# Rendered only when category_data is non-empty (i.e. at least one    #}
+    {# expense has been recorded and categorised for the active cycle).     #}
     {% if category_data %}
+
+        {# Category breakdown table #}
         <h3 style="margin-top:20px;">Spending by Category</h3>
         <table style="width:100%; border-collapse:collapse;">
             <thead>
@@ -29,6 +130,7 @@
                 </tr>
             </thead>
             <tbody>
+                {# Iterate over the category_data dict: key=category, value=% #}
                 {% for category, percentage in category_data.items %}
                 <tr>
                     <td>{{ category }}</td>
@@ -38,6 +140,9 @@
             </tbody>
         </table>
 
+        {# Chart.js doughnut/bar chart ------------------------------------ #}
+        {# Labels and values are embedded as comma-separated data-* attrs.   #}
+        {# charts.js reads these attributes and initialises the Chart object. #}
         <h3 style="margin-top:32px;">Spending Chart</h3>
         <div style="max-width:400px; margin: 0 auto;">
             <canvas id="categoryChart"
@@ -46,16 +151,22 @@
             </canvas>
         </div>
 
+        {# Load Chart.js from CDN, then the project's chart initialisation script #}
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         {% load static %}
         <script src="{% static 'core/js/charts.js' %}"></script>
 
     {% else %}
+        {# Empty state — shown when no transactions have been recorded yet #}
         <p>No spending data yet.</p>
     {% endif %}
+    {# ------------------------------------------------------------------- #}
 
+    {# ---- Print button ------------------------------------------------- #}
+    {# Uses the browser's native print dialog; no server-side PDF generation #}
     <div style="text-align:right; margin-top:24px;">
         <button onclick="window.print()" class="btn">🖨️ Print Report</button>
     </div>
+    {# ------------------------------------------------------------------- #}
 </div>
 {% endblock %}

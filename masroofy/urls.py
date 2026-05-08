@@ -1,24 +1,36 @@
 """
-URL configuration for masroofy project.
+Root URL Configuration – masroofy
+===================================
 
-The `urlpatterns` list routes URLs to views. For more information please see:
+Maps top-level URL prefixes to sub-applications.  Django loads this module
+because it is referenced by ``ROOT_URLCONF = 'masroofy.urls'`` in
+``masroofy/settings.py``.
+
+URL Patterns
+------------
+``/admin/``
+    Django's built-in admin interface.
+
+``/`` (prefix-less)
+    Delegates all remaining URL resolution to ``core/urls.py`` via
+    ``include('core.urls')``.  This keeps routing concerns inside the
+    ``core`` app and makes it easier to mount the app under a different
+    prefix in future (e.g. ``path('app/', include('core.urls'))``).
+
+References
+----------
+Django URL dispatcher:
     https://docs.djangoproject.com/en/6.0/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
+    # Django admin site — available at /admin/
     path('admin/', admin.site.urls),
-    # include app urls.py
+
+    # Delegate all other URL patterns to the core application.
+    # core/urls.py defines the full set of user-facing routes.
     path('', include('core.urls')),
 ]

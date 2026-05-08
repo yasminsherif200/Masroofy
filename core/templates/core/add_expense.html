@@ -1,23 +1,98 @@
 {% extends 'core/base.html' %}
+{#
+  Template : core/add_expense.html
+  ================================
+  Renders the expense-entry form that allows an authenticated user to
+  record a new transaction against their active budget cycle.
+
+  Extends
+  -------
+  core/base.html
+
+  Block
+  -----
+  content
+    A single card (max-width 500 px) containing the add-expense form,
+    plus optional success/error banners above it.
+
+  Context Variables
+  -----------------
+  cycle : BudgetCycle
+    The user's active budget cycle.  Passed by add_expense_view.add_expense
+    on both GET and POST.  Available for future use (e.g. displaying the
+    remaining balance as a hint above the form).
+
+  error : str | None
+    Rendered in red when add_expense_view returns a service-layer error
+    (e.g. negative amount, missing required field, DB failure).
+
+  success : str | None
+    Rendered in orange (not green) specifically for the threshold-alert
+    case: the expense was saved successfully but the user has now consumed
+    ≥ 80 % of their budget.
+    Value: "Expense added! Warning: you have used 80% of your budget."
+
+  Form
+  ----
+  Method : POST  (to the same URL — handled by add_expense_view.add_expense)
+  CSRF   : {% csrf_token %} included
+
+  Fields
+  ------
+  title (text, required)
+    Short label for the expense (e.g. "Lunch", "Taxi").
+
+  amount (number, required)
+    Expense value in EGP.
+    Constraints: min="0.01", step="0.01" (allows up to 2 decimal places).
+
+  category (text, optional)
+    User-defined category string (e.g. "Food", "Transport").
+    No dropdown — free-text entry; not marked required.
+
+  date (date, required)
+    The date the expense occurred; browser native date-picker (YYYY-MM-DD).
+
+  description (text, optional)
+    Free-text note for additional context; placeholder indicates it is
+    optional.  Defaults to '' in the view if omitted.
+
+  Notes
+  -----
+  - The `success` message is styled orange (not green) to reinforce that
+    it is also a warning, not just a confirmation.
+  - No client-side validation mirrors the server-side category or
+    description rules because both fields are optional.
+#}
+
 
 {% block content %}
 <div class="card" style="max-width: 500px;">
     <h2>Add Expense</h2>
 
+    {# Service-layer or validation error — shown in red #}
     {% if error %}
         <p style="color:red;">{{ error }}</p>
     {% endif %}
+
+    {# Threshold-alert success message — shown in orange (expense saved, but ≥ 80 % of budget used) #}
     {% if success %}
         <p style="color:orange;">{{ success }}</p>
     {% endif %}
 
+    {# Expense entry form — POST to the same URL #}
     <form method="POST">
         {% csrf_token %}
-        <input type="text" name="title" placeholder="Title" required>
-        <input type="number" name="amount" placeholder="Amount" min="0.01" step="0.01" required>
-        <input type="text" name="category" placeholder="Category">
-        <input type="date" name="date" required>
-        <input type="text" name="description" placeholder="Description (optional)">
+        {# Short label for the expense #}
+        <input type="text"   name="title"       placeholder="Title"                   required>
+        {# Positive monetary amount; step allows cents #}
+        <input type="number" name="amount"       placeholder="Amount"    min="0.01" step="0.01" required>
+        {# Optional category — free-text, no predefined list #}
+        <input type="text"   name="category"     placeholder="Category">
+        {# Date the expense occurred; browser renders a native date-picker #}
+        <input type="date"   name="date"                                               required>
+        {# Optional longer description or note #}
+        <input type="text"   name="description"  placeholder="Description (optional)">
         <button type="submit" class="btn">Add</button>
     </form>
 </div>

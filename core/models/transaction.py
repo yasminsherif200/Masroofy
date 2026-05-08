@@ -88,14 +88,4 @@ class Transaction(models.Model):
         ordering = ['-date', '-created_at']
 
     def __str__(self):
-        """
-        Return a concise string representation of the transaction.
-
-        :returns: A label showing the title, amount, and transaction type.
-        :rtype: str
-
-        Example::
-
-            str(tx)   # "Grocery run - 150.00 (expense)"
-        """
-        return f"{self.title} - {self.amount} ({self.transaction_type})"
+        return f"{self.title} - {self.amount} ({self.transaction_type})"    

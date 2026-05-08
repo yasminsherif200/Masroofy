@@ -1,15 +1,78 @@
 {% extends 'core/base.html' %}
+<!-- {#
+  Template : core/edit_transaction.html
+  =====================================
+  Renders a pre-populated form for editing an existing transaction.
+  Only reachable when history_view.edit_transaction determines the
+  transaction is eligible for editing (today's transactions only).
+
+  Extends
+  -------
+  core/base.html
+
+  Block
+  -----
+  content
+    A single card (max-width 500 px) with the pre-populated edit form.
+
+  Context Variables
+  -----------------
+  transaction : Transaction
+    The existing transaction record fetched by TransactionDAO.getTransactionByID().
+    Used to pre-populate each input field via value="{{ transaction.<field> }}".
+    Exposes:
+      transaction.title       — current title pre-filled into the title input
+      transaction.amount      — current amount pre-filled into the amount input
+      transaction.category    — current category pre-filled into the category input
+      transaction.description — current description pre-filled into the description input
+
+  Form
+  ----
+  Method : POST  (to the same URL — handled by history_view.edit_transaction)
+  CSRF   : {% csrf_token %} included
+
+  Fields
+  ------
+  title (text, required)
+    Pre-filled with transaction.title.  User can overwrite.
+
+  amount (number, required)
+    Pre-filled with transaction.amount.
+    Constraints: min="0.01", step="0.01".
+
+  category (text, optional)
+    Pre-filled with transaction.category.  Not marked required.
+
+  description (text, optional)
+    Pre-filled with transaction.description.  Not marked required.
+
+  Notes
+  -----
+  - The `date` field is intentionally absent — transaction dates cannot be
+    changed after creation (only today's transactions are editable, and
+    their date is already correct).
+  - No error context variable is currently passed to this template; server-side
+    validation failures in edit_transaction redirect to 'history' instead.
+  - The card's inline max-width style keeps the form compact on wide screens.
+#}
+
 
 {% block content %}
 <div class="card" style="max-width:500px;">
     <h2>Edit Transaction</h2>
 
+    {# Edit form — POST to the same URL (history_view.edit_transaction processes it) #}
     <form method="POST">
         {% csrf_token %}
-        <input type="text" name="title" value="{{ transaction.title }}" required>
-        <input type="number" name="amount" value="{{ transaction.amount }}" min="0.01" step="0.01" required>
-        <input type="text" name="category" value="{{ transaction.category }}">
-        <input type="text" name="description" value="{{ transaction.description }}">
+        {# Pre-filled with the transaction's existing title #}
+        <input type="text"   name="title"       value="{{ transaction.title }}"       required>
+        {# Pre-filled with the existing amount; step allows 2 decimal places #}
+        <input type="number" name="amount"       value="{{ transaction.amount }}"
+               min="0.01" step="0.01"                                                 required>
+        {# Pre-filled with the existing category; optional #}
+        <input type="text"   name="category"     value="{{ transaction.category }}">
+        {# Pre-filled with the existing description; optional #}
+        <input type="text"   name="description"  value="{{ transaction.description }}">
         <button type="submit" class="btn">Save Changes</button>
     </form>
 </div>
